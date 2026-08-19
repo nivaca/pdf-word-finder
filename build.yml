@@ -1,16 +1,21 @@
-name: Construir ejecutables
+name: Construir y publicar
 
 # PyInstaller no compila para otros sistemas: hay que ejecutarlo en cada uno.
 # Este flujo de trabajo lo hace por usted en las máquinas de GitHub, de modo
 # que no necesita tener a mano un Windows y un Mac.
 #
-# Se dispara al publicar una etiqueta (v1.0, v1.1…) o a mano desde la pestaña
-# «Actions» del repositorio.
+# Al publicar una etiqueta (v1.0, v1.1…) construye los tres ejecutables, los
+# empaqueta y crea una «release» con ellos adjuntos. Lanzado a mano desde la
+# pestaña «Actions», construye igual pero no publica nada: los resultados
+# quedan como artefactos temporales, útiles para probar antes de etiquetar.
 
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+
+permissions:
+  contents: write     # necesario para crear la release
 
 jobs:
   construir:
@@ -22,13 +27,16 @@ jobs:
         include:
           - os: windows-latest
             nombre: Windows
-            paquete: pdf-word-finder-windows
+            sufijo: windows-x64
           - os: macos-latest
             nombre: macOS (Apple Silicon)
-            paquete: pdf-word-finder-macos
+            sufijo: macos-arm64
+          - os: macos-13
+            nombre: macOS (Intel)
+            sufijo: macos-x64
           - os: ubuntu-22.04
             nombre: Linux
-            paquete: pdf-word-finder-linux
+            sufijo: linux-x64
 
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +51,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pypdf
 
+      - name: Comprobar que la etiqueta y la versión concuerdan
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          # Una etiqueta v1.1 sobre un código que se anuncia como 1.0 produce
+          # descargas que mienten sobre sí mismas. Más vale fallar aquí.
+          # (Sin tildes en los nombres de variable: bash no las admite.)
+          etiqueta="${GITHUB_REF_NAME#v}"
+          version=$(python -c "import pdf_word_finder as m; print(m.__version__)")
+          echo "etiqueta: $etiqueta / __version__: $version"
+          test "$etiqueta" = "$version"
+
       - name: Construir
         run: pyinstaller --clean --noconfirm pdf-word-finder.spec
 
@@ -50,20 +70,45 @@ jobs:
         shell: bash
         run: cp README.md LICENSE dist/
 
-      - name: Publicar el resultado
+      # El empaquetado va por sistema: cada uno tiene su formato esperado y,
+      # en el caso de macOS, su exigencia técnica.
+      - name: Empaquetar (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist\* -DestinationPath pdf-word-finder-${{ matrix.sufijo }}.zip
+
+      - name: Empaquetar (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # ditto y no zip: el paquete .app contiene enlaces simbólicos que
+          # zip convierte en copias, y la aplicación resultante no abre.
+          ditto -c -k --sequesterRsrc --keepParent dist pdf-word-finder-${{ matrix.sufijo }}.zip
+
+      - name: Empaquetar (Linux)
+        if: runner.os == 'Linux'
+        run: tar -czf pdf-word-finder-${{ matrix.sufijo }}.tar.gz -C dist .
+
+      - name: Guardar el paquete como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.paquete }}
-          path: dist/
+          name: pdf-word-finder-${{ matrix.sufijo }}
+          path: pdf-word-finder-${{ matrix.sufijo }}.*
 
-# Notas:
-#
-# * Ubuntu 22.04 en lugar de la última versión: el binario de Linux exige una
-#   glibc igual o más antigua que la de la máquina donde se construyó, así
-#   que compilar en la versión más vieja que se piense soportar amplía la
-#   compatibilidad. Al revés no funciona.
-#
-# * macos-latest da un binario para Apple Silicon (arm64). Para Mac con
-#   procesador Intel hay que añadir una entrada con `os: macos-13`.
-#
-# * Los ejecutables salen sin firma digital. Véase el README, §13.
+      - name: Adjuntarlo a la release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: pdf-word-finder-${{ matrix.sufijo }}.*
+          generate_release_notes: true
+          draft: true          # se publica a mano, tras comprobar los archivos
+          body: |
+            Ejecutables autónomos para Windows, macOS y Linux. No requieren
+            Python ni bibliotecas: basta descomprimir y ejecutar.
+
+            **Los ejecutables no están firmados.** Windows mostrará un aviso
+            de «editor desconocido» (Más información → Ejecutar de todas
+            formas). En macOS hay que abrir la aplicación con clic derecho →
+            Abrir la primera vez. En Linux, `chmod +x`.
+
+            Quien tenga Python instalado puede prescindir de estos paquetes y
+            usar directamente los archivos `.py` del código fuente.

@@ -545,26 +545,94 @@ declara en `name`, dentro de cada bloque `EXE`, y por eso los ejecutables
 salen como `pdf-word-finder` y `pdf-word-finder-gui` aunque las fuentes
 lleven guiones bajos.
 
-### Construcción automática con GitHub Actions
+### Construcción automática y publicación en GitHub
 
-El archivo `.github/workflows/build.yml` construye las tres versiones en las
-máquinas de GitHub, sin necesidad de tener a mano un Windows y un Mac. Se
-dispara al publicar una etiqueta:
+El archivo `.github/workflows/build.yml` construye las cuatro versiones
+—Windows, macOS Intel, macOS Apple Silicon y Linux— en las máquinas de
+GitHub, sin necesidad de tener a mano un Windows y un Mac, y las adjunta a
+una *release*. Todo el procedimiento se reduce a etiquetar:
 
 ```bash
-git tag v1.0
+git tag -a v1.0 -m "Primera versión pública"
 git push origin v1.0
 ```
 
-Los tres paquetes quedan disponibles para descarga en la pestaña «Actions»
-del repositorio. También puede lanzarse a mano desde ahí.
+Unos minutos después, en la pestaña «Releases» del repositorio aparece un
+borrador con los cuatro paquetes adjuntos. Se revisa y se pulsa «Publish
+release». Desde ese momento cualquiera puede descargarlos, con enlace
+permanente y sin necesidad de tener cuenta en GitHub.
 
-Dos detalles del flujo de trabajo: se compila en **Ubuntu 22.04** y no en la
-versión más reciente, porque un binario de Linux exige una glibc igual o más
-antigua que la de la máquina donde se construyó —compilar en la más vieja
-amplía la compatibilidad, al revés no funciona—; y `macos-latest` produce un
-binario para Apple Silicon, así que para Mac con procesador Intel hay que
-añadir una entrada `macos-13`.
+Sale como **borrador** a propósito: conviene descargar al menos un paquete y
+abrirlo antes de que el enlace sea público. Si prefiere que se publique solo,
+cambie `draft: true` por `draft: false` en el flujo de trabajo.
+
+Lanzado a mano desde la pestaña «Actions» (botón «Run workflow»), construye
+igual pero no publica nada: los paquetes quedan como artefactos temporales.
+Es la manera de probar la construcción antes de comprometerse con una
+etiqueta.
+
+#### Artefactos y releases no son lo mismo
+
+Conviene tener clara la distinción, porque GitHub usa las dos palabras y son
+cosas distintas:
+
+| | Artefacto | Release |
+|---|---|---|
+| Dónde | pestaña «Actions», dentro de cada ejecución | pestaña «Releases» |
+| Cuánto dura | se borra a los 90 días | permanente |
+| Quién descarga | solo con sesión iniciada en GitHub | cualquiera |
+| Formato | siempre `.zip` impuesto por GitHub | los archivos tal como se subieron |
+| Para qué | probar una construcción | distribuir |
+
+Para entregarle el programa a un colega, tiene que ser una release. Un
+artefacto es material de trabajo interno.
+
+#### Detalles del flujo
+
+Cuatro decisiones que conviene no deshacer sin saber por qué:
+
+* **Ubuntu 22.04** y no la versión más reciente: un binario de Linux exige
+  una glibc igual o más antigua que la de la máquina donde se construyó.
+  Compilar en la más vieja que se piense soportar amplía la compatibilidad;
+  al revés no funciona.
+
+* **Dos entradas de macOS.** `macos-latest` produce un binario para Apple
+  Silicon; los Mac con procesador Intel necesitan el de `macos-13`.
+
+* **En macOS se empaqueta con `ditto`, no con `zip`.** El paquete `.app`
+  contiene enlaces simbólicos que `zip` convierte en copias, y la aplicación
+  resultante no abre en la máquina de destino. Es un error clásico y difícil
+  de diagnosticar, porque la construcción no protesta.
+
+* **Se comprueba que la etiqueta y `__version__` concuerden**, y el flujo
+  falla si no. Una etiqueta `v1.1` sobre un código que se anuncia como 1.0
+  produce descargas que mienten sobre sí mismas, y eso no se puede corregir
+  después: las releases publicadas no se editan sin romper los enlaces de
+  quien ya descargó. Al subir la versión hay que tocar `__version__` en
+  `pdf_word_finder.py` **y** las dos líneas de versión del `.spec`.
+
+### Publicar una release a mano
+
+Si prefiere no depender del flujo automático, o quiere publicar una
+construcción hecha en su propia máquina, hay dos caminos.
+
+Por la web: pestaña «Releases» → «Draft a new release» → «Choose a tag»
+(puede crearla ahí mismo) → arrastrar los archivos de `dist/` a la zona de
+adjuntos → «Publish release».
+
+Por consola, con la herramienta oficial `gh`:
+
+```bash
+gh release create v1.0 \
+    pdf-word-finder-linux-x64.tar.gz \
+    pdf-word-finder-windows-x64.zip \
+    --title "pdf-word-finder 1.0" \
+    --notes "Primera versión pública."
+```
+
+En ambos casos recuerde que los paquetes deben construirse en cada sistema
+operativo, de modo que a mano solo podrá adjuntar el de la máquina que tenga
+delante.
 
 ### Firma digital
 
