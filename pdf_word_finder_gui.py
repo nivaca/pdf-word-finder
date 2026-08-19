@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import csv
 import os
+import platform
 import queue
 import sys
 import threading
@@ -240,7 +241,7 @@ class Aplicación(ttk.Frame):
         self.btn_buscar = ttk.Button(marco_botones, text="Buscar",
                                      command=self._buscar)
         self.btn_buscar.grid(row=0, column=0)
-        self.btn_txt = ttk.Button(marco_botones, text="Guardar lista TXT…",
+        self.btn_txt = ttk.Button(marco_botones, text="Guardar TXT…",
                                   command=self._guardar_txt, state="disabled")
         self.btn_txt.grid(row=0, column=1, padx=(6, 0))
         self.btn_csv = ttk.Button(marco_botones, text="Guardar CSV…",
@@ -250,6 +251,11 @@ class Aplicación(ttk.Frame):
                    command=self._copiar).grid(row=0, column=3, padx=(6, 0))
         ttk.Button(marco_botones, text="Limpiar",
                    command=self._limpiar).grid(row=0, column=4, padx=(6, 0))
+        # La columna vacía se lleva el espacio sobrante y empuja el botón de
+        # «Acerca de» contra el borde derecho, apartado de los de trabajo.
+        marco_botones.columnconfigure(5, weight=1)
+        ttk.Button(marco_botones, text="Acerca de…",
+                   command=self._acerca_de).grid(row=0, column=6, sticky="e")
 
         # --- resultados ---
         marco_res = ttk.LabelFrame(self, text="Resultados", padding=8)
@@ -385,6 +391,102 @@ class Aplicación(ttk.Frame):
         self.raíz.clipboard_clear()
         self.raíz.clipboard_append(texto)
         self.var_estado.set("Resultados copiados al portapapeles")
+
+    def _datos_técnicos(self) -> str:
+        """Lo que hace falta saber si algo va mal y hay que preguntar."""
+        líneas = [f"Python {sys.version.split()[0]}",
+                  f"Tcl/Tk {tk.TkVersion}"]
+        try:
+            import pypdf
+            líneas.append(f"pypdf {pypdf.__version__}")
+        except Exception:
+            líneas.append("pypdf: no encontrado")
+        # Se pregunta al núcleo, para que la ventana no pueda discrepar de
+        # lo que el programa hace de veras al extraer el texto.
+        mupdf = núcleo.cargar_pymupdf()
+        if mupdf is None:
+            líneas.append("PyMuPDF: no instalado (se extrae con pypdf)")
+        else:
+            v = getattr(mupdf, "__version__", "") or ""
+            if not v:  # en ediciones antiguas la versión vive en otro sitio
+                try:
+                    v = getattr(mupdf, "version", ("",))[0] or ""
+                except Exception:
+                    v = ""
+            líneas.append(f"PyMuPDF {v}".strip() + " (extractor en uso)")
+        if getattr(sys, "frozen", False):
+            líneas.append("ejecutable autónomo (PyInstaller)")
+        else:
+            líneas.append("ejecutado desde el código fuente")
+        líneas.append(f"sistema: {self._sistema()}")
+        return "\n".join(líneas)
+
+    @staticmethod
+    def _sistema() -> str:
+        s = platform.system()
+        if s == "Darwin":
+            nombre = f"macOS {platform.mac_ver()[0]}"
+        elif s == "Windows":
+            nombre = f"Windows {platform.release()}"
+        else:
+            nombre = f"{s} {platform.release().split('-')[0]}"
+        return f"{nombre} ({platform.machine()})"
+
+    def _acerca_de(self) -> None:
+        v = tk.Toplevel(self)
+        v.title("Acerca de pdf-word-finder")
+        v.transient(self.winfo_toplevel())
+        v.resizable(False, False)
+
+        marco = ttk.Frame(v, padding=16)
+        marco.grid(sticky="nsew")
+
+        ttk.Label(marco, text="pdf-word-finder",
+                  font=("TkDefaultFont", 14, "bold")).grid(sticky="w")
+        ttk.Label(marco, text=f"Versión {núcleo.__version__}").grid(
+            sticky="w", pady=(2, 10))
+
+        ttk.Label(
+            marco, justify="left", wraplength=420,
+            text="Busca palabras, frases o expresiones regulares en un PDF e "
+                 "informa en qué páginas aparecen, distinguiendo la "
+                 "numeración impresa de la secuencial del archivo.\n\n"
+                 f"{núcleo.__copyright__}\n"
+                 f"Licencia {núcleo.__license__}: puede usarse, modificarse y "
+                 "distribuirse libremente conservando el aviso de autoría. "
+                 "Se entrega sin garantía de ninguna clase.").grid(sticky="w")
+
+        ttk.Separator(marco, orient="horizontal").grid(
+            sticky="ew", pady=12)
+
+        ttk.Label(marco, text="Datos técnicos",
+                  font=("TkDefaultFont", 9, "bold")).grid(sticky="w")
+        datos = self._datos_técnicos()
+        ttk.Label(marco, text=datos, justify="left",
+                  font="TkFixedFont").grid(sticky="w", pady=(4, 0))
+
+        botones = ttk.Frame(marco)
+        botones.grid(sticky="e", pady=(16, 0))
+        ttk.Button(botones, text="Copiar datos técnicos",
+                   command=lambda: self._al_portapapeles(datos)).grid(
+                       row=0, column=0, padx=(0, 6))
+        cerrar = ttk.Button(botones, text="Cerrar", command=v.destroy)
+        cerrar.grid(row=0, column=1)
+
+        v.bind("<Escape>", lambda _e: v.destroy())
+        cerrar.focus_set()
+        # Centrada sobre la ventana principal, no en un rincón de la pantalla.
+        v.update_idletasks()
+        raíz = self.winfo_toplevel()
+        x = raíz.winfo_rootx() + (raíz.winfo_width() - v.winfo_width()) // 2
+        y = raíz.winfo_rooty() + (raíz.winfo_height() - v.winfo_height()) // 3
+        v.geometry(f"+{max(x, 0)}+{max(y, 0)}")
+        v.grab_set()
+
+    def _al_portapapeles(self, texto: str) -> None:
+        self.clipboard_clear()
+        self.clipboard_append(texto)
+        self.var_estado.set("Datos técnicos copiados al portapapeles")
 
     def _guardar_txt(self) -> None:
         if not self.últimos:

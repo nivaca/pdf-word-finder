@@ -61,6 +61,7 @@ __license__ = "MIT"
 
 import argparse
 import csv
+import importlib
 import re
 import sys
 import unicodedata
@@ -115,6 +116,23 @@ argparse.ngettext = (  # type: ignore[attr-defined]
 # --------------------------------------------------------------------------
 
 
+def cargar_pymupdf():
+    """Devuelve el módulo de PyMuPDF, o None si no está instalado.
+
+    Se prueba primero «pymupdf», que es el nombre moderno. El antiguo «fitz»
+    sigue funcionando, pero imprime un aviso de obsolescencia en la salida
+    ordinaria —que ensuciaría la lista al redirigirla a un archivo— y está
+    anunciada su desaparición. Se conserva solo como respaldo para versiones
+    antiguas de la biblioteca.
+    """
+    for nombre in ("pymupdf", "fitz"):
+        try:
+            return importlib.import_module(nombre)
+        except ImportError:
+            continue
+    return None
+
+
 def extract_pages(path: str) -> tuple[list[str], list[str], bool]:
     """Devuelve (textos, rótulos, tiene_rótulos_reales).
 
@@ -152,15 +170,12 @@ def extract_pages(path: str) -> tuple[list[str], list[str], bool]:
 
     # --- texto -----------------------------------------------------------
     texts = None
-    try:  # PyMuPDF extrae bastante mejor, si está instalado
-        import fitz  # type: ignore
-
-        with fitz.open(path) as doc:
+    mupdf = cargar_pymupdf()  # extrae bastante mejor, si está instalado
+    if mupdf is not None:
+        with mupdf.open(path) as doc:
             texts = [p.get_text("text") for p in doc]
         if len(texts) != n:
             texts = None
-    except ImportError:
-        pass
 
     if texts is None:
         texts = [(p.extract_text() or "") for p in reader.pages]

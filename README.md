@@ -79,7 +79,14 @@ Si `pymupdf` está instalado, el programa lo usa automáticamente para extraer
 el texto, porque respeta mejor el orden de lectura en páginas a dos
 columnas, con notas al pie o con aparato crítico. Si no está, recurre a
 `pypdf`, que basta para textos de composición sencilla. No hay que indicar
-nada: la elección es automática.
+nada: la elección es automática, y el botón «Acerca de…» de la interfaz
+gráfica dice cuál de los dos está en uso (§10).
+
+> **Nota.** PyMuPDF se importa como `pymupdf`, no con el antiguo `fitz`. Ese
+> nombre sigue funcionando, pero imprime un aviso de obsolescencia **en la
+> salida ordinaria**, que se colaría en la lista al redirigirla a un archivo,
+> y está anunciada su desaparición. Se conserva solo como respaldo para
+> versiones antiguas de la biblioteca.
 
 El archivo lleva la línea `#!/usr/bin/env python3`, de modo que en macOS y
 en Linux puede ejecutarse directamente si se le da permiso de ejecución:
@@ -441,9 +448,18 @@ La ventana ofrece lo mismo que la línea de órdenes: selector de archivo,
 recuadro para escribir los términos (uno por renglón, con `re:` y `#` igual
 que en un archivo de lista), casillas para todas las opciones, resultados en
 tipografía monoespaciada, casilla para pasar del informe de lista al
-detallado, y botones para guardar la lista alfabetizada en TXT, exportar el CSV o
-copiar el informe al portapapeles. El botón
-«Cargar lista…» permite volcar un archivo de términos ya preparado.
+detallado, y botones para guardar la lista alfabetizada en TXT, exportar el
+CSV o copiar el informe al portapapeles. El botón «Cargar lista…» permite
+volcar un archivo de términos ya preparado.
+
+Apartado a la derecha, el botón **«Acerca de…»** abre una ventana con la
+versión, la autoría, un resumen de la licencia y un apartado de datos
+técnicos: versión de Python y de Tcl/Tk, versión de pypdf, si PyMuPDF está
+instalado —y por tanto cuál de los dos está extrayendo el texto—, si el
+programa corre desde el código fuente o como ejecutable autónomo, y el
+sistema operativo. Un botón copia todo eso al portapapeles. No es adorno:
+cuando alguien reporte que «no encuentra una palabra que sí está», lo
+primero que hay que saber es con qué extractor se leyó el PDF.
 
 Solo requiere **tkinter**, que viene con Python. Si en Linux faltara:
 
