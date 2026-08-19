@@ -131,7 +131,8 @@ def buscar(ruta: str, términos: list[str], op: dict) -> dict:
     return {"resultados": resultados, "términos": términos,
             "hay_rótulos": hay_rótulos, "vacías": vacías,
             "total_páginas": len(páginas), "show_logical": op["show_logical"],
-            "detailed": op["detailed"] or op["context"]}
+            "detailed": op["detailed"] or op["context"],
+            "alphabetical": op["alphabetical"]}
 
 
 def componer_informe(datos: dict) -> str:
@@ -147,7 +148,8 @@ def componer_informe(datos: dict) -> str:
         has_labels=datos["hay_rótulos"], empty=datos["vacías"],
         total_pages=datos["total_páginas"],
         show_logical=datos["show_logical"],
-        detailed=datos["detailed"])
+        detailed=datos["detailed"],
+        alphabetical=datos["alphabetical"])
     return "\n\n".join(p for p in (notas, informe) if p)
 
 
@@ -217,6 +219,7 @@ class Aplicación(ttk.Frame):
             "regex_word": tk.BooleanVar(value=False),
             "no_dehyphenate": tk.BooleanVar(value=False),
             "show_logical": tk.BooleanVar(value=False),
+            "alphabetical": tk.BooleanVar(value=False),
             "detailed": tk.BooleanVar(value=False),
             "context": tk.BooleanVar(value=False),
         }
@@ -228,6 +231,7 @@ class Aplicación(ttk.Frame):
             ("regex_word", "Delimitar las expresiones regulares"),
             ("no_dehyphenate", "Conservar la partición de renglón"),
             ("show_logical", "Mostrar también la página secuencial"),
+            ("alphabetical", "Ordenar alfabéticamente"),
             ("detailed", "Informe detallado"),
             ("context", "Mostrar contexto (implica el informe detallado)"),
         ]
@@ -237,7 +241,7 @@ class Aplicación(ttk.Frame):
                                    padx=(0, 16))
 
         marco_ancho = ttk.Frame(marco_op)
-        marco_ancho.grid(row=5, column=0, columnspan=2, sticky="w",
+        marco_ancho.grid(row=6, column=0, columnspan=2, sticky="w",
                          pady=(6, 0))
         ttk.Label(marco_ancho, text="Ancho del contexto:").grid(row=0,
                                                                 column=0)
@@ -252,13 +256,16 @@ class Aplicación(ttk.Frame):
         self.btn_buscar = ttk.Button(marco_botones, text="Buscar",
                                      command=self._buscar)
         self.btn_buscar.grid(row=0, column=0)
+        self.btn_txt = ttk.Button(marco_botones, text="Guardar lista TXT…",
+                                  command=self._guardar_txt, state="disabled")
+        self.btn_txt.grid(row=0, column=1, padx=(6, 0))
         self.btn_csv = ttk.Button(marco_botones, text="Guardar CSV…",
                                   command=self._guardar_csv, state="disabled")
-        self.btn_csv.grid(row=0, column=1, padx=(6, 0))
+        self.btn_csv.grid(row=0, column=2, padx=(6, 0))
         ttk.Button(marco_botones, text="Copiar resultados",
-                   command=self._copiar).grid(row=0, column=2, padx=(6, 0))
+                   command=self._copiar).grid(row=0, column=3, padx=(6, 0))
         ttk.Button(marco_botones, text="Limpiar",
-                   command=self._limpiar).grid(row=0, column=3, padx=(6, 0))
+                   command=self._limpiar).grid(row=0, column=4, padx=(6, 0))
 
         # --- resultados ---
         marco_res = ttk.LabelFrame(self, text="Resultados", padding=8)
@@ -334,6 +341,7 @@ class Aplicación(ttk.Frame):
         self.buscando = True
         self.btn_buscar.configure(state="disabled")
         self.btn_csv.configure(state="disabled")
+        self.btn_txt.configure(state="disabled")
         self.var_estado.set("Buscando… (los PDF extensos tardan un poco)")
 
         # La extracción de texto puede tomar varios segundos en un libro
@@ -374,7 +382,9 @@ class Aplicación(ttk.Frame):
                     f"{páginas} "
                     f"{núcleo.plural(páginas, 'página', 'páginas')} "
                     f"de {carga['total_páginas']}")
-                self.btn_csv.configure(state="normal" if total else "disabled")
+                estado = "normal" if total else "disabled"
+                self.btn_csv.configure(state=estado)
+                self.btn_txt.configure(state=estado)
         finally:
             self.raíz.after(100, self._revisar_cola)
 
@@ -392,6 +402,25 @@ class Aplicación(ttk.Frame):
         self.raíz.clipboard_append(texto)
         self.var_estado.set("Resultados copiados al portapapeles")
 
+    def _guardar_txt(self) -> None:
+        if not self.últimos:
+            return
+        ruta = filedialog.asksaveasfilename(
+            title="Guardar la lista alfabetizada", defaultextension=".txt",
+            filetypes=[("Texto", "*.txt"), ("Todos", "*.*")])
+        if not ruta:
+            return
+        try:
+            n = núcleo.write_txt(ruta, self.últimos["términos"],
+                                 self.últimos["resultados"],
+                                 self.últimos["show_logical"])
+        except OSError as exc:
+            messagebox.showerror("Error", f"No se pudo escribir:\n{exc}")
+            return
+        self.var_estado.set(
+            f"Lista de {n} {núcleo.plural(n, 'entrada', 'entradas')} "
+            f"escrita en {ruta}")
+
     def _guardar_csv(self) -> None:
         if not self.últimos:
             return
@@ -405,10 +434,14 @@ class Aplicación(ttk.Frame):
                 w = csv.writer(fh)
                 w.writerow(["termino", "pagina_secuencial", "pagina_rotulada",
                             "apariciones", "contexto"])
-                for término in self.últimos["términos"]:
+                orden = sorted(self.últimos["términos"],
+                               key=lambda t: núcleo.sort_key(
+                                   núcleo.display_term(t)))
+                for término in orden:
                     for lg, lb, c, frags in self.últimos["resultados"].get(
                             término, []):
-                        w.writerow([término, lg, lb, c, " | ".join(frags)])
+                        w.writerow([núcleo.display_term(término), lg, lb, c,
+                                    " | ".join(frags)])
         except OSError as exc:
             messagebox.showerror("Error", f"No se pudo escribir:\n{exc}")
             return
@@ -419,6 +452,7 @@ class Aplicación(ttk.Frame):
         self._mostrar("")
         self.últimos = None
         self.btn_csv.configure(state="disabled")
+        self.btn_txt.configure(state="disabled")
         self.var_estado.set(f"pdf-word-finder {núcleo.__version__} — listo")
 
 

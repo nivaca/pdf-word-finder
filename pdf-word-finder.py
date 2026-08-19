@@ -31,6 +31,7 @@ Uso
     python pdf-word-finder.py libro.pdf --words-file terminos.txt --csv hits.csv
     python pdf-word-finder.py libro.pdf --regex "Marcolph\\w*" --context
     python pdf-word-finder.py libro.pdf amor "re:virtu(s|tem|tis)"
+    python pdf-word-finder.py libro.pdf --words-file onomastico.txt --txt indice.txt
 
 Opciones destacadas
 -------------------
@@ -43,6 +44,8 @@ Opciones destacadas
     --no-dehyphenate   conserva la división silábica de fin de renglón
     --show-logical     añade la página secuencial entre corchetes
     --detailed         informe detallado en vez de la lista compacta
+    --sort             ordena la lista alfabéticamente
+    --txt ARCHIVO      exporta la lista alfabetizada a un archivo de texto
     --context          muestra un fragmento de cada aparición
 
 Requiere:  pip install pypdf
@@ -265,9 +268,51 @@ def display_term(term: str) -> str:
     return term[len(RE_PREFIX):] if term.startswith(RE_PREFIX) else term
 
 
+def sort_key(s: str) -> str:
+    """Clave de ordenación alfabética española.
+
+    Prescinde de tildes y de mayúsculas —«ámbito» y «Ambito» van donde iría
+    «ambito»— pero conserva la eñe como letra propia, después de la ene:
+    «leña» va detrás de «lengua», como manda el alfabeto español. La ch y la
+    ll se ordenan como c+h y l+l, según la reforma de 1994.
+    """
+    s = unicodedata.normalize("NFC", s).casefold()
+    # Se sustituye la eñe antes de quitar diacríticos, que si no la
+    # convertirían en una simple ene. \uffff ordena después de cualquier
+    # letra, de modo que la eñe queda al final de las enes.
+    s = s.replace("ñ", "n\uffff")
+    return strip_accents(s)
+
+
+def index_lines(terms, results, show_logical: bool,
+                alphabetical: bool = False) -> list[str]:
+    """Renglones del formato de lista: «término pág., pág., pág.»."""
+    orden = sorted(terms, key=lambda t: sort_key(display_term(t))) \
+        if alphabetical else terms
+    líneas = []
+    for term in orden:
+        rows = results.get(term, [])
+        if not rows:
+            continue
+        páginas = ", ".join(fmt_page(lg, lb, show_logical)
+                            for lg, lb, _, _ in rows)
+        líneas.append(f"{display_term(term)} {páginas}")
+    return líneas
+
+
+def write_txt(path: str, terms, results, show_logical: bool) -> int:
+    """Escribe la lista alfabetizada en un archivo de texto. Devuelve
+    el número de renglones escritos."""
+    líneas = index_lines(terms, results, show_logical, alphabetical=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(líneas) + ("\n" if líneas else ""))
+    return len(líneas)
+
+
 def build_report(terms, results, *, has_labels: bool, empty: int,
                  total_pages: int, show_logical: bool,
-                 detailed: bool = False) -> tuple[str, str]:
+                 detailed: bool = False,
+                 alphabetical: bool = False) -> tuple[str, str]:
     """Arma el informe. Devuelve (informe, notas).
 
     Formato de lista (por omisión), pensado para copiarse a un índice:
@@ -309,16 +354,11 @@ def build_report(terms, results, *, has_labels: bool, empty: int,
         if has_labels and show_logical:
             líneas.append("Convención: página rotulada [sec. página secuencial]")
     else:
-        sin_apariciones = []
-        for term in terms:
-            rows = results.get(term, [])
-            if not rows:
-                sin_apariciones.append(display_term(term))
-                continue
-            páginas = ", ".join(fmt_page(lg, lb, show_logical)
-                                for lg, lb, _, _ in rows)
-            líneas.append(f"{display_term(term)} {páginas}")
+        líneas.extend(index_lines(terms, results, show_logical,
+                                  alphabetical=alphabetical))
         # Los términos sin apariciones no ensucian la lista: se avisan aparte.
+        sin_apariciones = [display_term(t) for t in terms
+                           if not results.get(t)]
         if sin_apariciones:
             notas.append("sin apariciones: " + ", ".join(sin_apariciones))
 
@@ -371,6 +411,12 @@ def main() -> None:
                          "--detailed)")
     ap.add_argument("--context-width", type=int, default=60, metavar="N",
                     help="caracteres de contexto a cada lado (por omisión: 60)")
+    ap.add_argument("--sort", action="store_true",
+                    help="ordena la lista alfabéticamente (por omisión sigue "
+                         "el orden en que se dieron los términos)")
+    ap.add_argument("--txt", metavar="ARCHIVO",
+                    help="escribe la lista, siempre alfabetizada, en un "
+                         "archivo de texto")
     ap.add_argument("--csv", metavar="ARCHIVO",
                     help="además, escribe los resultados en un archivo CSV")
     args = ap.parse_args()
@@ -424,7 +470,8 @@ def main() -> None:
     informe, notas = build_report(
         terms, results, has_labels=has_labels, empty=empty,
         total_pages=len(pages), show_logical=args.show_logical,
-        detailed=args.detailed or args.context)
+        detailed=args.detailed or args.context,
+        alphabetical=args.sort)
 
     # Las notas van al canal de error para que la salida ordinaria quede
     # limpia y pueda redirigirse a un archivo o encauzarse a otro programa.
@@ -433,19 +480,31 @@ def main() -> None:
     if informe:
         print(informe)
 
-    # --- CSV -------------------------------------------------------------
+    # --- exportación -----------------------------------------------------
+    # Los avisos van al canal de error, igual que las notas, para que la
+    # salida ordinaria siga siendo solo la lista.
+    if args.txt:
+        try:
+            n = write_txt(args.txt, terms, results, args.show_logical)
+        except OSError as exc:
+            sys.exit(f"error: no se pudo escribir «{args.txt}»: {exc}")
+        print(f"lista de {n} {plural(n, 'entrada', 'entradas')} escrita "
+              f"en {args.txt}", file=sys.stderr)
+
     if args.csv:
         try:
             with open(args.csv, "w", newline="", encoding="utf-8") as fh:
                 w = csv.writer(fh)
                 w.writerow(["termino", "pagina_secuencial", "pagina_rotulada",
                             "apariciones", "contexto"])
-                for term in terms:
+                for term in sorted(terms,
+                                   key=lambda t: sort_key(display_term(t))):
                     for lg, lb, c, snips in results.get(term, []):
-                        w.writerow([term, lg, lb, c, " | ".join(snips)])
+                        w.writerow([display_term(term), lg, lb, c,
+                                    " | ".join(snips)])
         except OSError as exc:
             sys.exit(f"error: no se pudo escribir «{args.csv}»: {exc}")
-        print(f"\nCSV escrito en {args.csv}")
+        print(f"CSV escrito en {args.csv}", file=sys.stderr)
 
 
 if __name__ == "__main__":

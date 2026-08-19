@@ -243,6 +243,8 @@ siempre en inglés; no está en mi mano traducirla.
 | `--detailed` | informe extenso en vez de la lista compacta |
 | `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
 | `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
+| `--sort` | ordena la lista alfabéticamente |
+| `--txt ARCHIVO` | exporta la lista alfabetizada a un archivo de texto |
 | `--csv ARCHIVO` | escribe además los resultados en un CSV |
 
 Los nombres de las opciones se dejaron en inglés a propósito, porque es la
@@ -289,7 +291,7 @@ casualmente quedan partidos ahí mismo. Si el texto los tiene en abundancia,
 
 ---
 
-## 7. Contexto y exportación
+## 7. Contexto, exportación y alfabetización
 
 ```bash
 python pdf-word-finder.py libro.pdf amor --context --context-width 80
@@ -308,6 +310,41 @@ cifras se sigue leyendo de un vistazo. `--context` activa por sí solo el
 informe detallado, porque en la lista compacta no hay dónde alojar los
 fragmentos; no hace falta añadir `--detailed`.
 
+### Exportar la lista a un archivo de texto
+
+```bash
+python pdf-word-finder.py libro.pdf --words-file onomastico.txt --txt indice.txt
+```
+
+`--txt` escribe la lista **siempre alfabetizada**, un término por renglón,
+sin encabezados ni notas: solo las entradas, listas para pegarse en el
+original de la edición.
+
+```
+amor i, 1, 4
+Marcolphus 1, 4
+philologia i, 4
+virtus 4
+```
+
+La ordenación sigue el alfabeto español: prescinde de tildes y de mayúsculas
+—«ámbito», «Ámbito» y «ambito» van al mismo sitio— pero **conserva la eñe
+como letra propia**, después de la ene, de modo que «leña» va detrás de
+«lengua» y no confundida entre las enes. La *ch* y la *ll* se ordenan como
+c+h y l+l, según la reforma académica de 1994. No depende de la
+configuración regional del sistema, así que el resultado es idéntico en
+cualquier máquina.
+
+Lo escrito va en UTF-8 y con salto de renglón final, para que se comporte
+bien en cualquier editor.
+
+Si además quiere ver ordenada la lista en pantalla, `--sort` hace lo propio
+con la salida ordinaria; por omisión esta respeta el orden en que se dieron
+los términos, que a veces es el que interesa (el de un guion de trabajo, por
+ejemplo).
+
+### Volcar a una hoja de cálculo
+
 Para volcar los resultados a una hoja de cálculo:
 
 ```bash
@@ -321,7 +358,12 @@ aparezca la rotulada: un archivo de datos se filtra y se ordena después, y
 tener la secuencial a mano evita rehacer la búsqueda si algún día hace falta
 verificar una página en el visor. Basta ocultar la columna. Va codificado en
 UTF-8; si al abrirlo en Excel se ven los acentos mal, hay que importarlo
-indicando esa codificación en lugar de abrirlo con doble clic.
+indicando esa codificación en lugar de abrirlo con doble clic. Las filas
+salen alfabetizadas por término, igual que en el TXT.
+
+Los avisos de que uno u otro archivo quedó escrito salen por el canal de
+error, no por la salida ordinaria, de modo que sigue siendo posible
+redirigir la lista a un archivo y exportar a la vez sin que se mezclen.
 
 ---
 
@@ -351,21 +393,23 @@ antes de dar por buena la ausencia.
 
 ## 9. Un ejemplo completo
 
-Índice de nombres propios de una edición crítica, con contexto y volcado a
-CSV, ignorando acentos porque el OCR es irregular:
+Índice de nombres propios de una edición crítica: la lista alfabetizada para
+el original, el CSV para verificar, y el contexto en pantalla para cotejar
+sobre la marcha, ignorando acentos porque el OCR es irregular:
 
 ```bash
 python pdf-word-finder.py dialogus.pdf \
     --words-file onomastico.txt \
     --ignore-accents \
     --context --context-width 90 \
+    --txt indice_onomastico.txt \
     --csv indice_onomastico.csv
 ```
 
-El CSV resultante, ordenado por término y página, sirve directamente como
-borrador de índice: la columna `pagina_rotulada` es la que se imprime, y
-`pagina_secuencial` queda de reserva para localizar cada pasaje en el visor
-si hay que cotejarlo.
+El TXT sale listo para pegarse en el original. El CSV, alfabetizado por
+término, sirve para verificar: la columna `pagina_rotulada` es la que se
+imprime, y `pagina_secuencial` queda de reserva para localizar cada pasaje
+en el visor si hay que cotejarlo.
 
 ---
 
@@ -389,7 +433,8 @@ La ventana ofrece lo mismo que la línea de órdenes: selector de archivo,
 recuadro para escribir los términos (uno por renglón, con `re:` y `#` igual
 que en un archivo de lista), casillas para todas las opciones, resultados en
 tipografía monoespaciada, casilla para pasar del informe de lista al
-detallado, y botones para guardar el CSV o copiar el informe al portapapeles. El botón
+detallado, y botones para guardar la lista alfabetizada en TXT, exportar el CSV o
+copiar el informe al portapapeles. El botón
 «Cargar lista…» permite volcar un archivo de términos ya preparado.
 
 Solo requiere **tkinter**, que viene con Python. Si en Linux faltara:
