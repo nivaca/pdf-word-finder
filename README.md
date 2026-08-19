@@ -32,13 +32,12 @@ En una edición corriente, entonces, la página **secuencial 15** es la
 búsqueda que informe la cifra equivocada.
 
 El programa informa **la rotulada**, que es la que le sirve al lector para
-abrir el libro, y la imprime **una por renglón**:
+abrir el libro, en un renglón por término:
 
 ```
-«amor»: 3 apariciones en 3 páginas
-    i
-    1
-    4
+amor i, 1, 4
+Sharahzad 3, 5, 23, 34
+Nombre de Dios 5, 23
 ```
 
 Si en algún momento hace falta también el índice interno del archivo —para
@@ -46,9 +45,7 @@ saltar a la página en el visor, por ejemplo—, la opción `--show-logical` lo
 añade entre corchetes, y solo cuando difiere del rótulo:
 
 ```
-    i [sec. 1]
-    1 [sec. 3]
-    4 [sec. 6]
+amor i [sec. 1], 1 [sec. 3], 4 [sec. 6]
 ```
 
 Si el PDF carece de árbol `/PageLabels`, el programa lo advierte
@@ -115,21 +112,31 @@ python pdf-word-finder.py libro.pdf amor virtus "de rerum natura"
 Salida:
 
 ```
-«amor»: 3 apariciones en 3 páginas
-    i
-    1
-    4
-
-«virtus»: 1 aparición en 1 página
-    4
-
-«de rerum natura»: sin apariciones
+amor i, 1, 4
+virtus 4
 ```
 
-Cada página ocupa un renglón, lo cual facilita pasar la lista a un índice o
-canalizarla hacia otra herramienta. Cuando un término aparece varias veces
-en la misma página, la cifra de apariciones se indica con `×` al final del
-renglón:
+Un renglón por término, con las páginas separadas por comas: es la forma de
+un índice, y puede pegarse tal cual en el original de la edición o
+importarse a un procesador de textos sin retoques.
+
+Los términos que no aparecen no ensucian la lista; se avisan aparte:
+
+```
+sin apariciones: de rerum natura
+```
+
+Esa nota, como todas las demás advertencias, sale por el **canal de error**
+y no por la salida ordinaria. La consecuencia práctica es que redirigir el
+resultado a un archivo da un índice limpio, mientras las advertencias se
+siguen viendo en pantalla:
+
+```bash
+python pdf-word-finder.py libro.pdf --words-file onomastico.txt > indice.txt
+```
+
+Con `--detailed` se obtiene en cambio el informe extenso, con el recuento de
+cada término y una página por renglón:
 
 ```
 «amor»: 7 apariciones en 3 páginas
@@ -137,6 +144,9 @@ renglón:
     1 ×4
     4 ×2
 ```
+
+Ahí sí se indica con `×` cuántas veces aparece el término en cada página, y
+es también el único formato en que caben los fragmentos de contexto (§7).
 
 Las frases de varias palabras se escriben entre comillas. Internamente los
 espacios se convierten en `\s+`, de modo que la frase se encuentra aunque
@@ -230,7 +240,8 @@ siempre en inglés; no está en mi mano traducirla.
 | `--ignore-accents` | ignora los signos diacríticos |
 | `--no-dehyphenate` | conserva la división silábica de fin de renglón |
 | `--show-logical` | añade la página secuencial entre corchetes |
-| `--context` | muestra un fragmento de cada aparición |
+| `--detailed` | informe extenso en vez de la lista compacta |
+| `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
 | `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
 | `--csv ARCHIVO` | escribe además los resultados en un CSV |
 
@@ -293,7 +304,9 @@ python pdf-word-finder.py libro.pdf amor --context --context-width 80
 ```
 
 El fragmento va sangrado bajo el número de página, de modo que la columna de
-cifras se sigue leyendo de un vistazo.
+cifras se sigue leyendo de un vistazo. `--context` activa por sí solo el
+informe detallado, porque en la lista compacta no hay dónde alojar los
+fragmentos; no hace falta añadir `--detailed`.
 
 Para volcar los resultados a una hoja de cálculo:
 
@@ -375,8 +388,8 @@ piezas no pueden desincronizarse.
 La ventana ofrece lo mismo que la línea de órdenes: selector de archivo,
 recuadro para escribir los términos (uno por renglón, con `re:` y `#` igual
 que en un archivo de lista), casillas para todas las opciones, resultados en
-tipografía monoespaciada para que la columna de páginas quede alineada, y
-botones para guardar el CSV o copiar el informe al portapapeles. El botón
+tipografía monoespaciada, casilla para pasar del informe de lista al
+detallado, y botones para guardar el CSV o copiar el informe al portapapeles. El botón
 «Cargar lista…» permite volcar un archivo de términos ya preparado.
 
 Solo requiere **tkinter**, que viene con Python. Si en Linux faltara:
@@ -404,6 +417,10 @@ cuadro de diálogo con el mismo mensaje.
 toma varios segundos, y hacerlo en el hilo principal congelaría la ventana.
 El resultado vuelve por una cola, que el hilo principal revisa cada décima
 de segundo, porque tkinter no admite que otro hilo toque los controles.
+El formato del informe, además, lo compone el núcleo y no la interfaz, de
+modo que tampoco ahí puede haber dos versiones que diverjan; lo único que
+cambia es que en la ventana las advertencias se muestran junto a los
+resultados, mientras que en la consola van al canal de error.
 Además, el texto extraído queda en memoria: cambiar una casilla y volver a
 buscar no relee el PDF.
 

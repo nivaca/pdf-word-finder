@@ -16,7 +16,14 @@ Con --show-logical se añade entre corchetes la página *secuencial* (lógica):
 el índice de la página dentro del archivo, empezando en 1, que es lo que
 cuenta la barra de desplazamiento del visor.
 
-Cada página se imprime en un renglón aparte.
+Cada término se informa en un renglón, seguido de las páginas en que
+aparece, listo para copiarse a un índice:
+
+    Sharahzad 3, 5, 23, 34
+    Nombre de Dios 5, 23
+
+Con --detailed se obtiene en cambio el recuento por término y una página
+por renglón, que es donde caben los fragmentos de contexto.
 
 Uso
 ---
@@ -35,6 +42,7 @@ Opciones destacadas
     --regex-word       exige límites de palabra también en las expresiones
     --no-dehyphenate   conserva la división silábica de fin de renglón
     --show-logical     añade la página secuencial entre corchetes
+    --detailed         informe detallado en vez de la lista compacta
     --context          muestra un fragmento de cada aparición
 
 Requiere:  pip install pypdf
@@ -252,11 +260,77 @@ def fmt_page(logical: int, label: str, show_logical: bool) -> str:
     return label
 
 
+def display_term(term: str) -> str:
+    """Quita el prefijo «re:» para que el rótulo sirva tal cual en un índice."""
+    return term[len(RE_PREFIX):] if term.startswith(RE_PREFIX) else term
+
+
+def build_report(terms, results, *, has_labels: bool, empty: int,
+                 total_pages: int, show_logical: bool,
+                 detailed: bool = False) -> tuple[str, str]:
+    """Arma el informe. Devuelve (informe, notas).
+
+    Formato de lista (por omisión), pensado para copiarse a un índice:
+
+        Sharahzad 3, 5, 23, 34
+        Nombre de Dios 5, 23
+
+    Formato detallado (--detailed), con el recuento por término y una
+    página por renglón, que es donde caben los fragmentos de contexto.
+    """
+    notas: list[str] = []
+    if not has_labels:
+        notas.append("nota: este PDF no tiene árbol /PageLabels; se supone "
+                     "que los números rotulados coinciden con los "
+                     "secuenciales.")
+    if empty:
+        notas.append(f"nota: {empty} de {total_pages} "
+                     f"{plural(total_pages, 'página', 'páginas')} no "
+                     f"arrojaron texto (¿digitalización sin OCR?).")
+
+    líneas: list[str] = []
+
+    if detailed:
+        for term in terms:
+            rows = results.get(term, [])
+            total = sum(r[2] for r in rows)
+            if not rows:
+                líneas.append(f"«{display_term(term)}»: sin apariciones")
+                continue
+            líneas.append(
+                f"«{display_term(term)}»: {total} "
+                f"{plural(total, 'aparición', 'apariciones')} en {len(rows)} "
+                f"{plural(len(rows), 'página', 'páginas')}")
+            for lg, lb, c, snips in rows:
+                líneas.append(f"    {fmt_page(lg, lb, show_logical)}"
+                              f"{f' ×{c}' if c > 1 else ''}")
+                líneas.extend(f"        {s}" for s in snips)
+            líneas.append("")
+        if has_labels and show_logical:
+            líneas.append("Convención: página rotulada [sec. página secuencial]")
+    else:
+        sin_apariciones = []
+        for term in terms:
+            rows = results.get(term, [])
+            if not rows:
+                sin_apariciones.append(display_term(term))
+                continue
+            páginas = ", ".join(fmt_page(lg, lb, show_logical)
+                                for lg, lb, _, _ in rows)
+            líneas.append(f"{display_term(term)} {páginas}")
+        # Los términos sin apariciones no ensucian la lista: se avisan aparte.
+        if sin_apariciones:
+            notas.append("sin apariciones: " + ", ".join(sin_apariciones))
+
+    return "\n".join(líneas).rstrip("\n"), "\n".join(notas)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         prog="pdf-word-finder.py",
-        description="Busca palabras en un PDF e informa, una por renglón, la "
-                    "página rotulada (impresa) en que aparece cada una.",
+        description="Busca palabras en un PDF e informa, en un renglón por "
+                    "término, las páginas rotuladas (impresas) en que "
+                    "aparece cada una.",
         epilog="Ejemplo: python pdf-word-finder.py libro.pdf amor "
                "\"re:virtu(s|tem|tis)\" --ignore-accents --context")
     ap.add_argument("--version", action="version",
@@ -289,8 +363,12 @@ def main() -> None:
     ap.add_argument("--show-logical", action="store_true",
                     help="muestra además la página secuencial, entre "
                          "corchetes, cuando difiere de la rotulada")
+    ap.add_argument("--detailed", action="store_true",
+                    help="informe detallado: recuento por término y una "
+                         "página por renglón (por omisión, lista compacta)")
     ap.add_argument("--context", action="store_true",
-                    help="muestra un fragmento de cada aparición")
+                    help="muestra un fragmento de cada aparición (implica "
+                         "--detailed)")
     ap.add_argument("--context-width", type=int, default=60, metavar="N",
                     help="caracteres de contexto a cada lado (por omisión: 60)")
     ap.add_argument("--csv", metavar="ARCHIVO",
@@ -342,33 +420,18 @@ def main() -> None:
             results[term].append((logical, label, len(hits), snippets))
 
     # --- informe por pantalla --------------------------------------------
-    if not has_labels:
-        print("nota: este PDF no tiene árbol /PageLabels; se supone que los "
-              "números rotulados coinciden con los secuenciales.\n")
-
     empty = sum(1 for p in pages if not p.strip())
-    if empty:
-        print(f"nota: {empty} de {len(pages)} "
-              f"{plural(len(pages), 'página', 'páginas')} no arrojaron texto "
-              f"(¿digitalización sin OCR?).\n")
+    informe, notas = build_report(
+        terms, results, has_labels=has_labels, empty=empty,
+        total_pages=len(pages), show_logical=args.show_logical,
+        detailed=args.detailed or args.context)
 
-    for term in terms:
-        rows = results.get(term, [])
-        total = sum(r[2] for r in rows)
-        if not rows:
-            print(f"«{term}»: sin apariciones")
-            continue
-        print(f"«{term}»: {total} {plural(total, 'aparición', 'apariciones')} "
-              f"en {len(rows)} {plural(len(rows), 'página', 'páginas')}")
-        for lg, lb, c, snips in rows:
-            print(f"    {fmt_page(lg, lb, args.show_logical)}"
-                  f"{f' ×{c}' if c > 1 else ''}")
-            for s in snips:
-                print(f"        {s}")
-        print()
-
-    if has_labels and args.show_logical:
-        print("Convención: página rotulada [sec. página secuencial]")
+    # Las notas van al canal de error para que la salida ordinaria quede
+    # limpia y pueda redirigirse a un archivo o encauzarse a otro programa.
+    if notas:
+        print(notas, file=sys.stderr)
+    if informe:
+        print(informe)
 
     # --- CSV -------------------------------------------------------------
     if args.csv:

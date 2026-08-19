@@ -130,43 +130,25 @@ def buscar(ruta: str, términos: list[str], op: dict) -> dict:
     vacías = sum(1 for p in páginas if not p.strip())
     return {"resultados": resultados, "términos": términos,
             "hay_rótulos": hay_rótulos, "vacías": vacías,
-            "total_páginas": len(páginas), "show_logical": op["show_logical"]}
+            "total_páginas": len(páginas), "show_logical": op["show_logical"],
+            "detailed": op["detailed"] or op["context"]}
 
 
 def componer_informe(datos: dict) -> str:
-    """Arma el mismo texto que imprime el programa de línea de órdenes."""
-    partes = []
-    if not datos["hay_rótulos"]:
-        partes.append("nota: este PDF no tiene árbol /PageLabels; se supone "
-                      "que los números rotulados coinciden con los "
-                      "secuenciales.\n")
-    if datos["vacías"]:
-        n, tot = datos["vacías"], datos["total_páginas"]
-        partes.append(f"nota: {n} de {tot} "
-                      f"{núcleo.plural(tot, 'página', 'páginas')} no "
-                      f"arrojaron texto (¿digitalización sin OCR?).\n")
+    """Arma el mismo texto que imprime el programa de línea de órdenes.
 
-    for término in datos["términos"]:
-        filas = datos["resultados"].get(término, [])
-        total = sum(f[2] for f in filas)
-        if not filas:
-            partes.append(f"«{término}»: sin apariciones\n")
-            continue
-        partes.append(
-            f"«{término}»: {total} "
-            f"{núcleo.plural(total, 'aparición', 'apariciones')} en "
-            f"{len(filas)} {núcleo.plural(len(filas), 'página', 'páginas')}")
-        for lg, lb, c, frags in filas:
-            veces = f" ×{c}" if c > 1 else ""
-            partes.append(f"    {núcleo.fmt_page(lg, lb, datos['show_logical'])}"
-                          f"{veces}")
-            for f in frags:
-                partes.append(f"        {f}")
-        partes.append("")
-
-    if datos["hay_rótulos"] and datos["show_logical"]:
-        partes.append("Convención: página rotulada [sec. página secuencial]")
-    return "\n".join(partes)
+    El formato lo compone el núcleo (build_report), no esta interfaz: así no
+    hay dos versiones del informe que puedan divergir. Lo único que cambia
+    es que aquí las notas se muestran junto al informe, mientras que en la
+    consola van al canal de error para no ensuciar la salida.
+    """
+    informe, notas = núcleo.build_report(
+        datos["términos"], datos["resultados"],
+        has_labels=datos["hay_rótulos"], empty=datos["vacías"],
+        total_pages=datos["total_páginas"],
+        show_logical=datos["show_logical"],
+        detailed=datos["detailed"])
+    return "\n\n".join(p for p in (notas, informe) if p)
 
 
 # --------------------------------------------------------------------------
@@ -235,6 +217,7 @@ class Aplicación(ttk.Frame):
             "regex_word": tk.BooleanVar(value=False),
             "no_dehyphenate": tk.BooleanVar(value=False),
             "show_logical": tk.BooleanVar(value=False),
+            "detailed": tk.BooleanVar(value=False),
             "context": tk.BooleanVar(value=False),
         }
         etiquetas = [
@@ -245,7 +228,8 @@ class Aplicación(ttk.Frame):
             ("regex_word", "Delimitar las expresiones regulares"),
             ("no_dehyphenate", "Conservar la partición de renglón"),
             ("show_logical", "Mostrar también la página secuencial"),
-            ("context", "Mostrar contexto"),
+            ("detailed", "Informe detallado"),
+            ("context", "Mostrar contexto (implica el informe detallado)"),
         ]
         for i, (clave, texto) in enumerate(etiquetas):
             ttk.Checkbutton(marco_op, text=texto, variable=self.op[clave]
@@ -253,7 +237,7 @@ class Aplicación(ttk.Frame):
                                    padx=(0, 16))
 
         marco_ancho = ttk.Frame(marco_op)
-        marco_ancho.grid(row=4, column=0, columnspan=2, sticky="w",
+        marco_ancho.grid(row=5, column=0, columnspan=2, sticky="w",
                          pady=(6, 0))
         ttk.Label(marco_ancho, text="Ancho del contexto:").grid(row=0,
                                                                 column=0)
