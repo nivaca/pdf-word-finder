@@ -1,4 +1,4 @@
-# pdf-word-finder.py
+# pdf-word-finder
 
 **Versión 1.0** · © Nicolás Vaughan 2026 · Licencia MIT
 
@@ -85,28 +85,36 @@ El archivo lleva la línea `#!/usr/bin/env python3`, de modo que en macOS y
 en Linux puede ejecutarse directamente si se le da permiso de ejecución:
 
 ```bash
-chmod +x pdf-word-finder.py
-./pdf-word-finder.py libro.pdf amor
+chmod +x pdf_word_finder.py
+./pdf_word_finder.py libro.pdf amor
 ```
 
 Para tenerlo a mano desde cualquier directorio, basta copiarlo a un lugar
-del `PATH` —`~/.local/bin/`, por ejemplo— incluso sin la extensión `.py`.
+del `PATH` —`~/.local/bin/`, por ejemplo—, o bien poner allí un enlace
+simbólico con el nombre corto de la orden:
 
-> **Nota sobre el guion del nombre.** Al llamarse `pdf-word-finder.py` y no
-> `pdf_word_finder.py`, el archivo no puede importarse como módulo con
-> `import pdf_word_finder`, porque el guion no es válido en un identificador
-> de Python. Para un programa de línea de órdenes esto no supone problema
-> alguno —el guion es, de hecho, la convención habitual en los ejecutables—,
-> pero conviene saberlo si algún día quiere reutilizar sus funciones desde
-> otro programa: en ese caso habría que renombrarlo con guiones bajos, o
-> bien cargarlo con `importlib.util.spec_from_file_location`.
+```bash
+ln -s ~/proyectos/pdf-word-finder/pdf_word_finder.py ~/.local/bin/pdf-word-finder
+```
+
+Así se escribe `pdf-word-finder libro.pdf amor` sin más.
+
+> **Nota sobre los nombres.** Los archivos fuente llevan guiones bajos
+> —`pdf_word_finder.py`— porque el guion no es un carácter válido en un
+> identificador de Python y un archivo llamado `pdf_word_finder.py` no podría
+> importarse con `import`. Los ejecutables y las órdenes de consola, en
+> cambio, llevan guiones: `pdf-word-finder`. No es una inconsecuencia sino la
+> convención corriente en Python, y trae una ventaja práctica: al ser el
+> núcleo un módulo importable de veras, la interfaz gráfica lo usa con un
+> `import` normal y el empaquetado para distribución no requiere artificio
+> alguno (§11).
 
 ---
 
 ## 3. Uso básico
 
 ```bash
-python pdf-word-finder.py libro.pdf amor virtus "de rerum natura"
+python pdf_word_finder.py libro.pdf amor virtus "de rerum natura"
 ```
 
 Salida:
@@ -132,7 +140,7 @@ resultado a un archivo da un índice limpio, mientras las advertencias se
 siguen viendo en pantalla:
 
 ```bash
-python pdf-word-finder.py libro.pdf --words-file onomastico.txt > indice.txt
+python pdf_word_finder.py libro.pdf --words-file onomastico.txt > indice.txt
 ```
 
 Con `--detailed` se obtiene en cambio el informe extenso, con el recuento de
@@ -170,7 +178,7 @@ re:sapient(ia|em|iae)
 ```
 
 ```bash
-python pdf-word-finder.py libro.pdf --words-file terminos.txt
+python pdf_word_finder.py libro.pdf --words-file terminos.txt
 ```
 
 Los términos del archivo se suman a los que se escriban en la línea de
@@ -186,13 +194,13 @@ Hay dos maneras de usarlas.
 palabras literales en la misma búsqueda:
 
 ```bash
-python pdf-word-finder.py libro.pdf amor "re:virtu(s|tem|tis)" "de rerum natura"
+python pdf_word_finder.py libro.pdf amor "re:virtu(s|tem|tis)" "de rerum natura"
 ```
 
 **En bloque**, con `--regex`, cuando *todos* los términos son patrones:
 
 ```bash
-python pdf-word-finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
+python pdf_word_finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
 ```
 
 Algunos patrones útiles para trabajo filológico:
@@ -210,7 +218,7 @@ decide dónde empieza y dónde termina. Si se prefiere que reciban los mismos
 límites de palabra que los términos literales, se añade `--regex-word`:
 
 ```bash
-python pdf-word-finder.py libro.pdf "re:amor|virtus" --regex-word
+python pdf_word_finder.py libro.pdf "re:amor|virtus" --regex-word
 ```
 
 La alternancia se agrupa antes de aplicar los límites, de modo que
@@ -263,7 +271,7 @@ contraintuitivos.
 Con `--substring` se busca en cualquier posición:
 
 ```bash
-python pdf-word-finder.py libro.pdf amor --substring
+python pdf_word_finder.py libro.pdf amor --substring
 ```
 
 ### Diacríticos
@@ -294,7 +302,7 @@ casualmente quedan partidos ahí mismo. Si el texto los tiene en abundancia,
 ## 7. Contexto, exportación y alfabetización
 
 ```bash
-python pdf-word-finder.py libro.pdf amor --context --context-width 80
+python pdf_word_finder.py libro.pdf amor --context --context-width 80
 ```
 
 ```
@@ -313,7 +321,7 @@ fragmentos; no hace falta añadir `--detailed`.
 ### Exportar la lista a un archivo de texto
 
 ```bash
-python pdf-word-finder.py libro.pdf --words-file onomastico.txt --txt indice.txt
+python pdf_word_finder.py libro.pdf --words-file onomastico.txt --txt indice.txt
 ```
 
 `--txt` escribe la lista **siempre alfabetizada**, un término por renglón,
@@ -348,7 +356,7 @@ ejemplo).
 Para volcar los resultados a una hoja de cálculo:
 
 ```bash
-python pdf-word-finder.py libro.pdf --words-file terminos.txt --context --csv indice.csv
+python pdf_word_finder.py libro.pdf --words-file terminos.txt --context --csv indice.csv
 ```
 
 El CSV lleva las columnas `termino`, `pagina_secuencial`, `pagina_rotulada`,
@@ -398,7 +406,7 @@ el original, el CSV para verificar, y el contexto en pantalla para cotejar
 sobre la marcha, ignorando acentos porque el OCR es irregular:
 
 ```bash
-python pdf-word-finder.py dialogus.pdf \
+python pdf_word_finder.py dialogus.pdf \
     --words-file onomastico.txt \
     --ignore-accents \
     --context --context-width 90 \
@@ -415,17 +423,17 @@ en el visor si hay que cotejarlo.
 
 ## 10. Interfaz gráfica
 
-El archivo `pdf-word-finder-gui.py` abre una ventana sencilla para quien
+El archivo `pdf_word_finder_gui.py` abre una ventana sencilla para quien
 prefiera no pasar por la consola, o para búsquedas ocasionales en las que no
 vale la pena recordar las opciones.
 
 ```bash
-python pdf-word-finder-gui.py
+python pdf_word_finder_gui.py
 ```
 
 No duplica ni una línea de la lógica de búsqueda: **carga el programa de
 línea de órdenes y llama a sus funciones**. Cualquier corrección que se haga
-en `pdf-word-finder.py` —en la extracción del texto, en la normalización, en
+en `pdf_word_finder.py` —en la extracción del texto, en la normalización, en
 la construcción de patrones— se refleja en la interfaz sin tocarla. Las dos
 piezas no pueden desincronizarse.
 
@@ -446,11 +454,11 @@ sudo apt install python3-tk
 Tres decisiones internas que conviene conocer, por si alguna vez retoca el
 archivo:
 
-**Cómo se carga el núcleo.** Como `pdf-word-finder.py` lleva guiones, no
-puede importarse con `import` (§2). La interfaz lo carga por ruta con
-`importlib.util.spec_from_file_location`, buscándolo en su misma carpeta.
-De ahí que los dos archivos deban viajar juntos; si no lo encuentra, avisa
-con un cuadro de diálogo en vez de fallar en silencio.
+**Cómo se carga el núcleo.** Con un `import pdf_word_finder` corriente, que
+funciona porque los dos archivos están en la misma carpeta. De ahí que deban
+viajar juntos; si no lo encuentra, la interfaz avisa con un cuadro de diálogo
+en vez de fallar en silencio. Que sea una importación normal y no una carga
+por ruta importa además para el empaquetado (§11).
 
 **Los errores no cierran la ventana.** Las funciones del núcleo terminan el
 programa con `sys.exit()` cuando el PDF está cifrado o una expresión regular
@@ -471,16 +479,127 @@ buscar no relee el PDF.
 
 ---
 
-## 11. Versión
+## 11. Distribución
+
+Para quien tenga Python instalado basta con los archivos `.py`. Para
+entregárselo a alguien que no lo tenga —un asistente de investigación, un
+colega de otro departamento— hay que empaquetarlo en un ejecutable autónomo.
+
+### PyInstaller
+
+El archivo `pdf-word-finder.spec` que acompaña al proyecto contiene la
+receta. En la carpeta del proyecto:
+
+```bash
+pip install pyinstaller pypdf
+pyinstaller --clean --noconfirm pdf-word-finder.spec
+```
+
+En `dist/` quedan dos ejecutables autónomos —la interfaz gráfica y el
+programa de consola— que no requieren Python ni bibliotecas en la máquina de
+destino. Pesan unos 15–20 MB cada uno, casi todo intérprete de Python.
+
+**No se puede compilar para otros sistemas.** PyInstaller empaqueta el
+intérprete de la máquina donde se ejecuta, de modo que el `.exe` de Windows
+hay que construirlo en Windows, el `.app` de macOS en un Mac y el binario de
+Linux en Linux. No hay opción de compilación cruzada, y los emuladores no
+sirven. Las dos salidas son tener acceso a las tres máquinas, o dejar que lo
+haga GitHub (más abajo).
+
+Dos particularidades de esta receta que conviene no perder de vista si algún
+día la modifica:
+
+La receta no necesita ni `datas` ni `hiddenimports`, y conviene entender por
+qué, porque es justamente lo que se estropearía si algún día renombrara los
+archivos con guiones. PyInstaller descubre lo que hay que empaquetar
+**analizando el código en busca de importaciones**. Como la interfaz importa
+el núcleo con un `import` corriente (§10), lo encuentra, y con él encuentra
+`pypdf` y sus dependencias. Todo entra solo.
+
+Si el núcleo llevara guiones en el nombre no podría importarse así: habría
+que cargarlo por ruta con importlib, empaquetarlo como archivo acompañante
+en `datas`, declarar `hiddenimports=["pypdf"]` a mano —porque un archivo
+tratado como dato no se analiza, y sus importaciones quedan invisibles— y
+añadir código para localizarlo dentro del ejecutable, donde los acompañantes
+no están junto al programa sino en una carpeta temporal cuya ruta queda en
+`sys._MEIPASS`. Los guiones bajos ahorran las cuatro cosas.
+
+**El nombre del ejecutable es independiente del nombre del archivo.** Se
+declara en `name`, dentro de cada bloque `EXE`, y por eso los ejecutables
+salen como `pdf-word-finder` y `pdf-word-finder-gui` aunque las fuentes
+lleven guiones bajos.
+
+### Construcción automática con GitHub Actions
+
+El archivo `.github/workflows/build.yml` construye las tres versiones en las
+máquinas de GitHub, sin necesidad de tener a mano un Windows y un Mac. Se
+dispara al publicar una etiqueta:
+
+```bash
+git tag v1.0
+git push origin v1.0
+```
+
+Los tres paquetes quedan disponibles para descarga en la pestaña «Actions»
+del repositorio. También puede lanzarse a mano desde ahí.
+
+Dos detalles del flujo de trabajo: se compila en **Ubuntu 22.04** y no en la
+versión más reciente, porque un binario de Linux exige una glibc igual o más
+antigua que la de la máquina donde se construyó —compilar en la más vieja
+amplía la compatibilidad, al revés no funciona—; y `macos-latest` produce un
+binario para Apple Silicon, así que para Mac con procesador Intel hay que
+añadir una entrada `macos-13`.
+
+### Firma digital
+
+Los ejecutables salen sin firmar, y eso tiene consecuencias visibles para
+quien los reciba:
+
+* **Windows.** SmartScreen mostrará una advertencia de «editor desconocido».
+  El usuario puede seguir adelante desde «Más información → Ejecutar de
+  todas formas», pero conviene avisarle de antemano. Firmar requiere un
+  certificado de firma de código, que es de pago.
+
+* **macOS.** Gatekeeper se negará a abrir la aplicación. La salida sin
+  certificado es hacer clic derecho sobre ella y elegir «Abrir», que ofrece
+  una excepción por única vez. Firmar y notarizar exige una cuenta de
+  desarrollador de Apple, también de pago.
+
+* **Linux.** No hay obstáculo; basta `chmod +x`.
+
+Para distribución dentro de la universidad, la advertencia y una instrucción
+de una línea suelen bastar. Para distribución pública conviene pensar en los
+certificados.
+
+### Alternativas más ligeras
+
+Si el destinatario tiene Python, hay caminos más sencillos que un ejecutable
+de 20 MB:
+
+* **Los archivos sueltos.** Cuatro archivos y `pip install pypdf`. Para
+  colegas con soltura técnica es lo más simple.
+
+* **Un archivo `.pyz`.** `zipapp` empaqueta todo en un solo archivo
+  ejecutable por Python, de unos pocos KB. Requiere Python en la máquina de
+  destino, pero se distribuye como una unidad.
+
+* **Un paquete instalable.** Con un `pyproject.toml` mínimo y un punto de
+  entrada de consola, `pipx install` deja la orden `pdf-word-finder`
+  disponible en todo el sistema. Es lo indicado si algún día publica el
+  programa en PyPI, y los nombres actuales ya sirven tal cual.
+
+---
+
+## 12. Versión
 
 Versión **1.0**. La cifra se consulta desde el propio programa:
 
 ```bash
-python pdf-word-finder.py --version
+python pdf_word_finder.py --version
 ```
 
 ```
-pdf-word-finder.py 1.0 — © Nicolás Vaughan 2026 — licencia MIT
+pdf-word-finder 1.0 — © Nicolás Vaughan 2026 — licencia MIT
 ```
 
 En el código está declarada una sola vez, en `__version__`, y de ahí la toma
@@ -489,7 +608,7 @@ cambiarla en ese único lugar.
 
 ---
 
-## 12. Licencia y autoría
+## 13. Licencia y autoría
 
 © Nicolás Vaughan 2026.
 
@@ -502,7 +621,9 @@ distribuya. El programa se entrega «tal cual», sin garantía de ninguna
 clase.
 
 Al distribuirlo conviene incluir los cuatro archivos
-—`pdf-word-finder.py`, `pdf-word-finder-gui.py`, `README.md` y `LICENSE`—,
+—`pdf_word_finder.py`, `pdf_word_finder_gui.py`, `README.md` y `LICENSE`—,
+más `pdf-word-finder.spec` si quiere que otros puedan construir los
+ejecutables,
 porque el aviso de copyright que llevan incorporado los dos programas remite
 al último, y la interfaz gráfica no funciona sin el programa de línea de
 órdenes en la misma carpeta.

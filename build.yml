@@ -1,0 +1,69 @@
+name: Construir ejecutables
+
+# PyInstaller no compila para otros sistemas: hay que ejecutarlo en cada uno.
+# Este flujo de trabajo lo hace por usted en las máquinas de GitHub, de modo
+# que no necesita tener a mano un Windows y un Mac.
+#
+# Se dispara al publicar una etiqueta (v1.0, v1.1…) o a mano desde la pestaña
+# «Actions» del repositorio.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  construir:
+    name: ${{ matrix.nombre }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            nombre: Windows
+            paquete: pdf-word-finder-windows
+          - os: macos-latest
+            nombre: macOS (Apple Silicon)
+            paquete: pdf-word-finder-macos
+          - os: ubuntu-22.04
+            nombre: Linux
+            paquete: pdf-word-finder-linux
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pypdf
+
+      - name: Construir
+        run: pyinstaller --clean --noconfirm pdf-word-finder.spec
+
+      - name: Añadir la documentación
+        shell: bash
+        run: cp README.md LICENSE dist/
+
+      - name: Publicar el resultado
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.paquete }}
+          path: dist/
+
+# Notas:
+#
+# * Ubuntu 22.04 en lugar de la última versión: el binario de Linux exige una
+#   glibc igual o más antigua que la de la máquina donde se construyó, así
+#   que compilar en la versión más vieja que se piense soportar amplía la
+#   compatibilidad. Al revés no funciona.
+#
+# * macos-latest da un binario para Apple Silicon (arm64). Para Mac con
+#   procesador Intel hay que añadir una entrada con `os: macos-13`.
+#
+# * Los ejecutables salen sin firma digital. Véase el README, §13.

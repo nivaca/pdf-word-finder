@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-pdf-word-finder-gui.py — interfaz gráfica sencilla para pdf-word-finder.py.
+pdf_word_finder_gui.py — interfaz gráfica sencilla para pdf_word_finder.py.
 
 Versión 1.0
 © Nicolás Vaughan 2026. Distribuido bajo licencia MIT (véase LICENSE).
 
-No duplica nada del programa de línea de órdenes: carga «pdf-word-finder.py»
-y reutiliza sus funciones (extracción del texto, normalización, construcción
+No duplica nada del programa de línea de órdenes: importa
+«pdf_word_finder.py» y reutiliza sus funciones (extracción del texto, normalización, construcción
 de patrones, formato de las páginas). Cualquier corrección hecha allí se
 refleja aquí sin tocar este archivo.
 
@@ -17,46 +17,30 @@ Solo requiere tkinter, que viene con Python. En Linux, si falta:
 from __future__ import annotations
 
 import csv
-import importlib.util
 import os
 import queue
 import sys
 import threading
 import tkinter as tk
-from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
 # --------------------------------------------------------------------------
 # Carga del programa de línea de órdenes
 # --------------------------------------------------------------------------
-# El nombre «pdf-word-finder.py» lleva guiones, de modo que no es un
-# identificador válido de Python y no puede importarse con `import`. Se carga
-# entonces por ruta, con importlib.
-
-NOMBRE_CLI = "pdf-word-finder.py"
-
-
-def cargar_nucleo():
-    """Devuelve el módulo del programa de línea de órdenes."""
-    ruta = Path(__file__).resolve().parent / NOMBRE_CLI
-    if not ruta.exists():
-        raise FileNotFoundError(
-            f"No se encontró «{NOMBRE_CLI}».\n\n"
-            f"Debe estar en la misma carpeta que esta interfaz:\n{ruta.parent}")
-    spec = importlib.util.spec_from_file_location("pdf_word_finder_core", ruta)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"No se pudo cargar «{ruta}».")
-    modulo = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(modulo)
-    return modulo
-
+# Ambos archivos viven en la misma carpeta, de modo que basta importarlo. Es
+# importante que sea una importación corriente y no una carga por ruta: así
+# PyInstaller la ve al analizar el código y empaqueta el núcleo —y con él
+# pypdf— sin necesidad de declararlos a mano (véase el README, §11).
 
 try:
-    núcleo = cargar_nucleo()
-except Exception as exc:  # sin el núcleo no hay nada que hacer
+    import pdf_word_finder as núcleo
+except ImportError as exc:  # sin el núcleo no hay nada que hacer
     _raíz = tk.Tk()
     _raíz.withdraw()
-    messagebox.showerror("pdf-word-finder", str(exc))
+    messagebox.showerror(
+        "pdf-word-finder",
+        f"No se encontró «pdf_word_finder.py».\n\n"
+        f"Debe estar en la misma carpeta que esta interfaz.\n\n{exc}")
     sys.exit(1)
 
 

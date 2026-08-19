@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-pdf-word-finder.py — busca palabras o frases en un PDF e informa dónde
+pdf_word_finder.py — busca palabras o frases en un PDF e informa dónde
 aparecen.
 
 Versión 1.0
@@ -27,11 +27,11 @@ por renglón, que es donde caben los fragmentos de contexto.
 
 Uso
 ---
-    python pdf-word-finder.py libro.pdf amor virtus "de rerum natura"
-    python pdf-word-finder.py libro.pdf --words-file terminos.txt --csv hits.csv
-    python pdf-word-finder.py libro.pdf --regex "Marcolph\\w*" --context
-    python pdf-word-finder.py libro.pdf amor "re:virtu(s|tem|tis)"
-    python pdf-word-finder.py libro.pdf --words-file onomastico.txt --txt indice.txt
+    python pdf_word_finder.py libro.pdf amor virtus "de rerum natura"
+    python pdf_word_finder.py libro.pdf --words-file terminos.txt --csv hits.csv
+    python pdf_word_finder.py libro.pdf --regex "Marcolph\\w*" --context
+    python pdf_word_finder.py libro.pdf amor "re:virtu(s|tem|tis)"
+    python pdf_word_finder.py libro.pdf --words-file onomastico.txt --txt indice.txt
 
 Opciones destacadas
 -------------------
@@ -367,11 +367,11 @@ def build_report(terms, results, *, has_labels: bool, empty: int,
 
 def main() -> None:
     ap = argparse.ArgumentParser(
-        prog="pdf-word-finder.py",
+        prog="pdf-word-finder",
         description="Busca palabras en un PDF e informa, en un renglón por "
                     "término, las páginas rotuladas (impresas) en que "
                     "aparece cada una.",
-        epilog="Ejemplo: python pdf-word-finder.py libro.pdf amor "
+        epilog="Ejemplo: python pdf_word_finder.py libro.pdf amor "
                "\"re:virtu(s|tem|tis)\" --ignore-accents --context")
     ap.add_argument("--version", action="version",
                     version=f"%(prog)s {__version__} — {__copyright__} — "
