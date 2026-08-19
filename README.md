@@ -356,7 +356,60 @@ si hay que cotejarlo.
 
 ---
 
-## 10. Versión
+## 10. Interfaz gráfica
+
+El archivo `pdf-word-finder-gui.py` abre una ventana sencilla para quien
+prefiera no pasar por la consola, o para búsquedas ocasionales en las que no
+vale la pena recordar las opciones.
+
+```bash
+python pdf-word-finder-gui.py
+```
+
+No duplica ni una línea de la lógica de búsqueda: **carga el programa de
+línea de órdenes y llama a sus funciones**. Cualquier corrección que se haga
+en `pdf-word-finder.py` —en la extracción del texto, en la normalización, en
+la construcción de patrones— se refleja en la interfaz sin tocarla. Las dos
+piezas no pueden desincronizarse.
+
+La ventana ofrece lo mismo que la línea de órdenes: selector de archivo,
+recuadro para escribir los términos (uno por renglón, con `re:` y `#` igual
+que en un archivo de lista), casillas para todas las opciones, resultados en
+tipografía monoespaciada para que la columna de páginas quede alineada, y
+botones para guardar el CSV o copiar el informe al portapapeles. El botón
+«Cargar lista…» permite volcar un archivo de términos ya preparado.
+
+Solo requiere **tkinter**, que viene con Python. Si en Linux faltara:
+
+```bash
+sudo apt install python3-tk
+```
+
+Tres decisiones internas que conviene conocer, por si alguna vez retoca el
+archivo:
+
+**Cómo se carga el núcleo.** Como `pdf-word-finder.py` lleva guiones, no
+puede importarse con `import` (§2). La interfaz lo carga por ruta con
+`importlib.util.spec_from_file_location`, buscándolo en su misma carpeta.
+De ahí que los dos archivos deban viajar juntos; si no lo encuentra, avisa
+con un cuadro de diálogo en vez de fallar en silencio.
+
+**Los errores no cierran la ventana.** Las funciones del núcleo terminan el
+programa con `sys.exit()` cuando el PDF está cifrado o una expresión regular
+está mal formada, que es lo correcto en la consola pero cerraría la ventana
+sin explicación. La interfaz captura ese `SystemExit` y lo convierte en un
+cuadro de diálogo con el mismo mensaje.
+
+**La búsqueda corre en un hilo aparte.** Extraer el texto de un libro entero
+toma varios segundos, y hacerlo en el hilo principal congelaría la ventana.
+El resultado vuelve por una cola, que el hilo principal revisa cada décima
+de segundo, porque tkinter no admite que otro hilo toque los controles.
+Además, el texto extraído queda en memoria: cambiar una casilla y volver a
+buscar no relee el PDF.
+
+---
+
+## 11. Versión
 
 Versión **1.0**. La cifra se consulta desde el propio programa:
 
@@ -374,7 +427,7 @@ cambiarla en ese único lugar.
 
 ---
 
-## 11. Licencia y autoría
+## 12. Licencia y autoría
 
 © Nicolás Vaughan 2026.
 
@@ -386,6 +439,8 @@ copyright y el de la licencia en las copias o partes sustanciales que
 distribuya. El programa se entrega «tal cual», sin garantía de ninguna
 clase.
 
-Al distribuirlo conviene incluir los tres archivos —`pdf-word-finder.py`,
-`README.md` y `LICENSE`—, porque el aviso de copyright que el encabezado del
-programa lleva incorporado remite a este último.
+Al distribuirlo conviene incluir los cuatro archivos
+—`pdf-word-finder.py`, `pdf-word-finder-gui.py`, `README.md` y `LICENSE`—,
+porque el aviso de copyright que llevan incorporado los dos programas remite
+al último, y la interfaz gráfica no funciona sin el programa de línea de
+órdenes en la misma carpeta.
