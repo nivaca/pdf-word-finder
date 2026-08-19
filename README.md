@@ -1,4 +1,4 @@
-# pdf-word-finder
+# pdf_word_finder
 
 **Versión 1.0** · © Nicolás Vaughan 2026 · Licencia MIT
 
@@ -19,13 +19,13 @@ que está realmente impreso en la página, almacenado en el árbol
 `/PageLabels` del catálogo del documento. Ese árbol permite expresar todo lo
 que la tradición tipográfica exige:
 
-| Situación | Secuencial | Rotulada |
-|---|---|---|
-| Cubierta y portada sin numerar | 1, 2 | *(sin rótulo o «C-1»)* |
-| Preliminares en romanas bajas | 3–14 | i–xii |
-| Cuerpo de la obra | 15– | 1– |
-| Reinicio en el segundo volumen | 320– | 1– |
-| Láminas intercaladas | 88 | «Lám. IV» |
+| Situación                      | Secuencial | Rotulada               |
+|--------------------------------|------------|------------------------|
+| Cubierta y portada sin numerar | 1, 2       | *(sin rótulo o «C-1»)* |
+| Preliminares en romanas bajas  | 3–14       | i–xii                  |
+| Cuerpo de la obra              | 15–        | 1–                     |
+| Reinicio en el segundo volumen | 320–       | 1–                     |
+| Láminas intercaladas           | 88         | «Lám. IV»              |
 
 En una edición corriente, entonces, la página **secuencial 15** es la
 **rotulada 1**: un desfase de catorce unidades que hace inservible cualquier
@@ -101,16 +101,16 @@ del `PATH` —`~/.local/bin/`, por ejemplo—, o bien poner allí un enlace
 simbólico con el nombre corto de la orden:
 
 ```bash
-ln -s ~/proyectos/pdf-word-finder/pdf_word_finder.py ~/.local/bin/pdf-word-finder
+ln -s ~/proyectos/pdf_word_finder/pdf_word_finder.py ~/.local/bin/pdf_word_finder
 ```
 
-Así se escribe `pdf-word-finder libro.pdf amor` sin más.
+Así se escribe `pdf_word_finder libro.pdf amor` sin más.
 
 > **Nota sobre los nombres.** Los archivos fuente llevan guiones bajos
 > —`pdf_word_finder.py`— porque el guion no es un carácter válido en un
 > identificador de Python y un archivo llamado `pdf_word_finder.py` no podría
 > importarse con `import`. Los ejecutables y las órdenes de consola, en
-> cambio, llevan guiones: `pdf-word-finder`. No es una inconsecuencia sino la
+> cambio, llevan guiones: `pdf_word_finder`. No es una inconsecuencia sino la
 > convención corriente en Python, y trae una ventaja práctica: al ser el
 > núcleo un módulo importable de veras, la interfaz gráfica lo usa con un
 > `import` normal y el empaquetado para distribución no requiere artificio
@@ -212,13 +212,13 @@ python pdf_word_finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
 
 Algunos patrones útiles para trabajo filológico:
 
-| Patrón | Encuentra |
-|---|---|
-| `re:\bMarcolph\w*` | todas las formas flexivas de un nombre propio |
-| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional |
-| `re:\d{1,2}[.,]\s*\d+` | referencias del tipo «12, 34» |
-| `re:[A-Z]{2,}` | versalitas y siglas transcritas en mayúsculas |
-| `re:qu[oa]d\s+\w+` | una colocación sintáctica |
+| Patrón                  | Encuentra                                     |
+|-------------------------|-----------------------------------------------|
+| `re:\bMarcolph\w*`      | todas las formas flexivas de un nombre propio |
+| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional       |
+| `re:\d{1,2}[.,]\s*\d+`  | referencias del tipo «12, 34»                 |
+| `re:[A-Z]{2,}`          | versalitas y siglas transcritas en mayúsculas |
+| `re:qu[oa]d\s+\w+`      | una colocación sintáctica                     |
 
 Por omisión los patrones **no** se delimitan: quien escribe la expresión
 decide dónde empieza y dónde termina. Si se prefiere que reciban los mismos
@@ -245,22 +245,22 @@ siempre en inglés; no está en mi mano traducirla.
 
 ## 6. Opciones
 
-| Opción | Efecto |
-|---|---|
-| `--words-file ARCHIVO` | lee términos adicionales de un archivo |
-| `--regex` | trata todos los términos como expresiones regulares |
-| `--regex-word` | aplica límites de palabra también a las expresiones |
-| `--substring` | busca también dentro de las palabras |
-| `--case-sensitive` | distingue mayúsculas de minúsculas |
-| `--ignore-accents` | ignora los signos diacríticos |
-| `--no-dehyphenate` | conserva la división silábica de fin de renglón |
-| `--show-logical` | añade la página secuencial entre corchetes |
-| `--detailed` | informe extenso en vez de la lista compacta |
-| `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
-| `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
-| `--sort` | ordena la lista alfabéticamente |
-| `--txt ARCHIVO` | exporta la lista alfabetizada a un archivo de texto |
-| `--csv ARCHIVO` | escribe además los resultados en un CSV |
+| Opción                 | Efecto                                                        |
+|------------------------|---------------------------------------------------------------|
+| `--words-file ARCHIVO` | lee términos adicionales de un archivo                        |
+| `--regex`              | trata todos los términos como expresiones regulares           |
+| `--regex-word`         | aplica límites de palabra también a las expresiones           |
+| `--substring`          | busca también dentro de las palabras                          |
+| `--case-sensitive`     | distingue mayúsculas de minúsculas                            |
+| `--ignore-accents`     | ignora los signos diacríticos                                 |
+| `--no-dehyphenate`     | conserva la división silábica de fin de renglón               |
+| `--show-logical`       | añade la página secuencial entre corchetes                    |
+| `--detailed`           | informe extenso en vez de la lista compacta                   |
+| `--context`            | muestra un fragmento de cada aparición (implica `--detailed`) |
+| `--context-width N`    | anchura del fragmento (60 caracteres por omisión)             |
+| `--sort`               | ordena la lista alfabéticamente                               |
+| `--txt ARCHIVO`        | exporta la lista alfabetizada a un archivo de texto           |
+| `--csv ARCHIVO`        | escribe además los resultados en un CSV                       |
 
 Los nombres de las opciones se dejaron en inglés a propósito, porque es la
 convención de las herramientas de línea de órdenes y porque así se pueden
@@ -503,17 +503,50 @@ colega de otro departamento— hay que empaquetarlo en un ejecutable autónomo.
 
 ### PyInstaller
 
-El archivo `pdf-word-finder.spec` que acompaña al proyecto contiene la
+El archivo `pdf_word_finder.spec` que acompaña al proyecto contiene la
 receta. En la carpeta del proyecto:
 
 ```bash
 pip install pyinstaller pypdf
-pyinstaller --clean --noconfirm pdf-word-finder.spec
+pyinstaller --clean --noconfirm pdf_word_finder.spec
 ```
 
-En `dist/` quedan dos ejecutables autónomos —la interfaz gráfica y el
-programa de consola— que no requieren Python ni bibliotecas en la máquina de
-destino. Pesan unos 15–20 MB cada uno, casi todo intérprete de Python.
+En `dist/pdf_word_finder/` quedan los dos programas —la interfaz gráfica y
+el de consola— junto a la subcarpeta `_internal/` con el intérprete y las
+bibliotecas que ambos comparten. Nada de eso requiere Python en la máquina
+de destino. La carpeta entera pesa unos 50 MB y **se distribuye completa,
+comprimida**: los ejecutables no funcionan sacados de ella.
+
+#### Carpeta o archivo único
+
+Ese es el modo por omisión, y conviene que lo siga siendo. La alternativa es
+un ejecutable único por programa:
+
+```bash
+PWF_ONEFILE=1 pyinstaller pdf_word_finder.spec          # macOS y Linux
+$env:PWF_ONEFILE=1; pyinstaller pdf_word_finder.spec    # Windows, PowerShell
+```
+
+Un archivo suelto es más cómodo de mandar, pero paga dos precios. El
+primero es de velocidad: el ejecutable único se descomprime en una carpeta
+temporal **en cada ejecución**. Medido en esta misma máquina, arrancar y
+mostrar la versión:
+
+|          | Modo carpeta | Archivo único |
+|----------|--------------|---------------|
+| arranque | 79 ms        | 264 ms        |
+
+El segundo precio es peor: descomprimirse solo en una carpeta temporal y
+ejecutar código desde allí es, estructuralmente, lo que hace cierto programa
+malicioso, y algunos antivirus lo tratan como tal. El modo carpeta no hace
+nada de eso y levanta muchas menos sospechas. Si un colega reporta que
+Windows «no puede acceder al archivo» —mensaje engañoso con el que Defender
+suele anunciar que ha bloqueado algo—, el modo carpeta es la primera
+respuesta.
+
+En rigor el modo carpeta ocupa más en disco (unos 50 MB frente a 33 MB
+sumando los dos ejecutables únicos), pero comprimido para su distribución la
+diferencia se estrecha, y de todos modos no es lo que está en juego.
 
 **No se puede compilar para otros sistemas.** PyInstaller empaqueta el
 intérprete de la máquina donde se ejecuta, de modo que el `.exe` de Windows
@@ -542,7 +575,7 @@ no están junto al programa sino en una carpeta temporal cuya ruta queda en
 
 **El nombre del ejecutable es independiente del nombre del archivo.** Se
 declara en `name`, dentro de cada bloque `EXE`, y por eso los ejecutables
-salen como `pdf-word-finder` y `pdf-word-finder-gui` aunque las fuentes
+salen como `pdf_word_finder` y `pdf_word_finder-gui` aunque las fuentes
 lleven guiones bajos.
 
 ### Construcción automática y publicación en GitHub
@@ -576,13 +609,13 @@ etiqueta.
 Conviene tener clara la distinción, porque GitHub usa las dos palabras y son
 cosas distintas:
 
-| | Artefacto | Release |
-|---|---|---|
-| Dónde | pestaña «Actions», dentro de cada ejecución | pestaña «Releases» |
-| Cuánto dura | se borra a los 90 días | permanente |
-| Quién descarga | solo con sesión iniciada en GitHub | cualquiera |
-| Formato | siempre `.zip` impuesto por GitHub | los archivos tal como se subieron |
-| Para qué | probar una construcción | distribuir |
+|                | Artefacto                                   | Release                           |
+|----------------|---------------------------------------------|-----------------------------------|
+| Dónde          | pestaña «Actions», dentro de cada ejecución | pestaña «Releases»                |
+| Cuánto dura    | se borra a los 90 días                      | permanente                        |
+| Quién descarga | solo con sesión iniciada en GitHub          | cualquiera                        |
+| Formato        | siempre `.zip` impuesto por GitHub          | los archivos tal como se subieron |
+| Para qué       | probar una construcción                     | distribuir                        |
 
 Para entregarle el programa a un colega, tiene que ser una release. Un
 artefacto es material de trabajo interno.
@@ -624,53 +657,14 @@ Por consola, con la herramienta oficial `gh`:
 
 ```bash
 gh release create v1.0 \
-    pdf-word-finder-linux-x64.tar.gz \
-    pdf-word-finder-windows-x64.zip \
-    --title "pdf-word-finder 1.0" \
+    pdf_word_finder-linux-x64.tar.gz \
+    pdf_word_finder-windows-x64.zip \
+    --title "pdf_word_finder 1.0" \
     --notes "Primera versión pública."
 ```
 
 En ambos casos recuerde que los paquetes deben construirse en cada sistema
-operativo, de modo que a mano solo podrá adjuntar el de la máquina que tenga
-delante.
-
-### Firma digital
-
-Los ejecutables salen sin firmar, y eso tiene consecuencias visibles para
-quien los reciba:
-
-* **Windows.** SmartScreen mostrará una advertencia de «editor desconocido».
-  El usuario puede seguir adelante desde «Más información → Ejecutar de
-  todas formas», pero conviene avisarle de antemano. Firmar requiere un
-  certificado de firma de código, que es de pago.
-
-* **macOS.** Gatekeeper se negará a abrir la aplicación. La salida sin
-  certificado es hacer clic derecho sobre ella y elegir «Abrir», que ofrece
-  una excepción por única vez. Firmar y notarizar exige una cuenta de
-  desarrollador de Apple, también de pago.
-
-* **Linux.** No hay obstáculo; basta `chmod +x`.
-
-Para distribución dentro de la universidad, la advertencia y una instrucción
-de una línea suelen bastar. Para distribución pública conviene pensar en los
-certificados.
-
-### Alternativas más ligeras
-
-Si el destinatario tiene Python, hay caminos más sencillos que un ejecutable
-de 20 MB:
-
-* **Los archivos sueltos.** Cuatro archivos y `pip install pypdf`. Para
-  colegas con soltura técnica es lo más simple.
-
-* **Un archivo `.pyz`.** `zipapp` empaqueta todo en un solo archivo
-  ejecutable por Python, de unos pocos KB. Requiere Python en la máquina de
-  destino, pero se distribuye como una unidad.
-
-* **Un paquete instalable.** Con un `pyproject.toml` mínimo y un punto de
-  entrada de consola, `pipx install` deja la orden `pdf-word-finder`
-  disponible en todo el sistema. Es lo indicado si algún día publica el
-  programa en PyPI, y los nombres actuales ya sirven tal cual.
+operativo, de modo que a mano solo podrá adjuntar el de la máquina que tenga delante.
 
 ---
 
@@ -683,7 +677,7 @@ python pdf_word_finder.py --version
 ```
 
 ```
-pdf-word-finder 1.0 — © Nicolás Vaughan 2026 — licencia MIT
+pdf_word_finder 1.0 — © Nicolás Vaughan 2026 — licencia MIT
 ```
 
 En el código está declarada una sola vez, en `__version__`, y de ahí la toma
@@ -706,7 +700,7 @@ clase.
 
 Al distribuirlo conviene incluir los cuatro archivos
 —`pdf_word_finder.py`, `pdf_word_finder_gui.py`, `README.md` y `LICENSE`—,
-más `pdf-word-finder.spec` si quiere que otros puedan construir los
+más `pdf_word_finder.spec` si quiere que otros puedan construir los
 ejecutables,
 porque el aviso de copyright que llevan incorporado los dos programas remite
 al último, y la interfaz gráfica no funciona sin el programa de línea de

@@ -68,25 +68,28 @@ jobs:
 
       - name: Añadir la documentación
         shell: bash
-        run: cp README.md LICENSE dist/
+        run: |
+          # En modo carpeta todo cuelga de dist/pdf-word-finder/; la
+          # documentación va dentro, para que viaje con el programa.
+          cp README.md LICENSE dist/pdf-word-finder/
 
       # El empaquetado va por sistema: cada uno tiene su formato esperado y,
       # en el caso de macOS, su exigencia técnica.
       - name: Empaquetar (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Compress-Archive -Path dist\* -DestinationPath pdf-word-finder-${{ matrix.sufijo }}.zip
+        run: Compress-Archive -Path dist\pdf-word-finder -DestinationPath pdf-word-finder-${{ matrix.sufijo }}.zip
 
       - name: Empaquetar (macOS)
         if: runner.os == 'macOS'
         run: |
           # ditto y no zip: el paquete .app contiene enlaces simbólicos que
           # zip convierte en copias, y la aplicación resultante no abre.
-          ditto -c -k --sequesterRsrc --keepParent dist pdf-word-finder-${{ matrix.sufijo }}.zip
+          ditto -c -k --sequesterRsrc --keepParent dist/pdf-word-finder.app pdf-word-finder-${{ matrix.sufijo }}.zip
 
       - name: Empaquetar (Linux)
         if: runner.os == 'Linux'
-        run: tar -czf pdf-word-finder-${{ matrix.sufijo }}.tar.gz -C dist .
+        run: tar -czf pdf-word-finder-${{ matrix.sufijo }}.tar.gz -C dist pdf-word-finder
 
       - name: Guardar el paquete como artefacto
         uses: actions/upload-artifact@v4
@@ -103,7 +106,9 @@ jobs:
           draft: true          # se publica a mano, tras comprobar los archivos
           body: |
             Ejecutables autónomos para Windows, macOS y Linux. No requieren
-            Python ni bibliotecas: basta descomprimir y ejecutar.
+            Python ni bibliotecas: basta descomprimir la carpeta entera y
+            ejecutar lo que hay dentro. La carpeta no se puede deshacer: los
+            programas necesitan las bibliotecas que la acompañan.
 
             **Los ejecutables no están firmados.** Windows mostrará un aviso
             de «editor desconocido» (Más información → Ejecutar de todas
