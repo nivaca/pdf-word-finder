@@ -64,7 +64,7 @@ jobs:
           test "$etiqueta" = "$version"
 
       - name: Construir
-        run: pyinstaller --clean --noconfirm pdf-word-finder.spec
+        run: pyinstaller --clean --noconfirm pdf_word_finder.spec
 
       - name: Añadir la documentación
         shell: bash

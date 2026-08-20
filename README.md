@@ -1,4 +1,4 @@
-# pdf_word_finder
+# pdf-word-finder
 
 **Versión 1.0** · © Nicolás Vaughan 2026 · Licencia MIT
 
@@ -19,13 +19,13 @@ que está realmente impreso en la página, almacenado en el árbol
 `/PageLabels` del catálogo del documento. Ese árbol permite expresar todo lo
 que la tradición tipográfica exige:
 
-| Situación                      | Secuencial | Rotulada               |
-|--------------------------------|------------|------------------------|
-| Cubierta y portada sin numerar | 1, 2       | *(sin rótulo o «C-1»)* |
-| Preliminares en romanas bajas  | 3–14       | i–xii                  |
-| Cuerpo de la obra              | 15–        | 1–                     |
-| Reinicio en el segundo volumen | 320–       | 1–                     |
-| Láminas intercaladas           | 88         | «Lám. IV»              |
+| Situación | Secuencial | Rotulada |
+|---|---|---|
+| Cubierta y portada sin numerar | 1, 2 | *(sin rótulo o «C-1»)* |
+| Preliminares en romanas bajas | 3–14 | i–xii |
+| Cuerpo de la obra | 15– | 1– |
+| Reinicio en el segundo volumen | 320– | 1– |
+| Láminas intercaladas | 88 | «Lám. IV» |
 
 En una edición corriente, entonces, la página **secuencial 15** es la
 **rotulada 1**: un desfase de catorce unidades que hace inservible cualquier
@@ -101,16 +101,16 @@ del `PATH` —`~/.local/bin/`, por ejemplo—, o bien poner allí un enlace
 simbólico con el nombre corto de la orden:
 
 ```bash
-ln -s ~/proyectos/pdf_word_finder/pdf_word_finder.py ~/.local/bin/pdf_word_finder
+ln -s ~/proyectos/pdf-word-finder/pdf_word_finder.py ~/.local/bin/pdf-word-finder
 ```
 
-Así se escribe `pdf_word_finder libro.pdf amor` sin más.
+Así se escribe `pdf-word-finder libro.pdf amor` sin más.
 
 > **Nota sobre los nombres.** Los archivos fuente llevan guiones bajos
 > —`pdf_word_finder.py`— porque el guion no es un carácter válido en un
 > identificador de Python y un archivo llamado `pdf_word_finder.py` no podría
 > importarse con `import`. Los ejecutables y las órdenes de consola, en
-> cambio, llevan guiones: `pdf_word_finder`. No es una inconsecuencia sino la
+> cambio, llevan guiones: `pdf-word-finder`. No es una inconsecuencia sino la
 > convención corriente en Python, y trae una ventaja práctica: al ser el
 > núcleo un módulo importable de veras, la interfaz gráfica lo usa con un
 > `import` normal y el empaquetado para distribución no requiere artificio
@@ -212,13 +212,13 @@ python pdf_word_finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
 
 Algunos patrones útiles para trabajo filológico:
 
-| Patrón                  | Encuentra                                     |
-|-------------------------|-----------------------------------------------|
-| `re:\bMarcolph\w*`      | todas las formas flexivas de un nombre propio |
-| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional       |
-| `re:\d{1,2}[.,]\s*\d+`  | referencias del tipo «12, 34»                 |
-| `re:[A-Z]{2,}`          | versalitas y siglas transcritas en mayúsculas |
-| `re:qu[oa]d\s+\w+`      | una colocación sintáctica                     |
+| Patrón | Encuentra |
+|---|---|
+| `re:\bMarcolph\w*` | todas las formas flexivas de un nombre propio |
+| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional |
+| `re:\d{1,2}[.,]\s*\d+` | referencias del tipo «12, 34» |
+| `re:[A-Z]{2,}` | versalitas y siglas transcritas en mayúsculas |
+| `re:qu[oa]d\s+\w+` | una colocación sintáctica |
 
 Por omisión los patrones **no** se delimitan: quien escribe la expresión
 decide dónde empieza y dónde termina. Si se prefiere que reciban los mismos
@@ -245,22 +245,22 @@ siempre en inglés; no está en mi mano traducirla.
 
 ## 6. Opciones
 
-| Opción                 | Efecto                                                        |
-|------------------------|---------------------------------------------------------------|
-| `--words-file ARCHIVO` | lee términos adicionales de un archivo                        |
-| `--regex`              | trata todos los términos como expresiones regulares           |
-| `--regex-word`         | aplica límites de palabra también a las expresiones           |
-| `--substring`          | busca también dentro de las palabras                          |
-| `--case-sensitive`     | distingue mayúsculas de minúsculas                            |
-| `--ignore-accents`     | ignora los signos diacríticos                                 |
-| `--no-dehyphenate`     | conserva la división silábica de fin de renglón               |
-| `--show-logical`       | añade la página secuencial entre corchetes                    |
-| `--detailed`           | informe extenso en vez de la lista compacta                   |
-| `--context`            | muestra un fragmento de cada aparición (implica `--detailed`) |
-| `--context-width N`    | anchura del fragmento (60 caracteres por omisión)             |
-| `--sort`               | ordena la lista alfabéticamente                               |
-| `--txt ARCHIVO`        | exporta la lista alfabetizada a un archivo de texto           |
-| `--csv ARCHIVO`        | escribe además los resultados en un CSV                       |
+| Opción | Efecto |
+|---|---|
+| `--words-file ARCHIVO` | lee términos adicionales de un archivo |
+| `--regex` | trata todos los términos como expresiones regulares |
+| `--regex-word` | aplica límites de palabra también a las expresiones |
+| `--substring` | busca también dentro de las palabras |
+| `--case-sensitive` | distingue mayúsculas de minúsculas |
+| `--ignore-accents` | ignora los signos diacríticos |
+| `--no-dehyphenate` | conserva la división silábica de fin de renglón |
+| `--show-logical` | añade la página secuencial entre corchetes |
+| `--detailed` | informe extenso en vez de la lista compacta |
+| `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
+| `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
+| `--sort` | ordena la lista alfabéticamente |
+| `--txt ARCHIVO` | exporta la lista alfabetizada a un archivo de texto |
+| `--csv ARCHIVO` | escribe además los resultados en un CSV |
 
 Los nombres de las opciones se dejaron en inglés a propósito, porque es la
 convención de las herramientas de línea de órdenes y porque así se pueden
@@ -511,7 +511,7 @@ pip install pyinstaller pypdf
 pyinstaller --clean --noconfirm pdf_word_finder.spec
 ```
 
-En `dist/pdf_word_finder/` quedan los dos programas —la interfaz gráfica y
+En `dist/pdf-word-finder/` quedan los dos programas —la interfaz gráfica y
 el de consola— junto a la subcarpeta `_internal/` con el intérprete y las
 bibliotecas que ambos comparten. Nada de eso requiere Python en la máquina
 de destino. La carpeta entera pesa unos 50 MB y **se distribuye completa,
@@ -532,9 +532,9 @@ primero es de velocidad: el ejecutable único se descomprime en una carpeta
 temporal **en cada ejecución**. Medido en esta misma máquina, arrancar y
 mostrar la versión:
 
-|          | Modo carpeta | Archivo único |
-|----------|--------------|---------------|
-| arranque | 79 ms        | 264 ms        |
+| | Modo carpeta | Archivo único |
+|---|---|---|
+| arranque | 79 ms | 264 ms |
 
 El segundo precio es peor: descomprimirse solo en una carpeta temporal y
 ejecutar código desde allí es, estructuralmente, lo que hace cierto programa
@@ -575,7 +575,7 @@ no están junto al programa sino en una carpeta temporal cuya ruta queda en
 
 **El nombre del ejecutable es independiente del nombre del archivo.** Se
 declara en `name`, dentro de cada bloque `EXE`, y por eso los ejecutables
-salen como `pdf_word_finder` y `pdf_word_finder-gui` aunque las fuentes
+salen como `pdf-word-finder` y `pdf-word-finder-gui` aunque las fuentes
 lleven guiones bajos.
 
 ### Construcción automática y publicación en GitHub
@@ -609,13 +609,13 @@ etiqueta.
 Conviene tener clara la distinción, porque GitHub usa las dos palabras y son
 cosas distintas:
 
-|                | Artefacto                                   | Release                           |
-|----------------|---------------------------------------------|-----------------------------------|
-| Dónde          | pestaña «Actions», dentro de cada ejecución | pestaña «Releases»                |
-| Cuánto dura    | se borra a los 90 días                      | permanente                        |
-| Quién descarga | solo con sesión iniciada en GitHub          | cualquiera                        |
-| Formato        | siempre `.zip` impuesto por GitHub          | los archivos tal como se subieron |
-| Para qué       | probar una construcción                     | distribuir                        |
+| | Artefacto | Release |
+|---|---|---|
+| Dónde | pestaña «Actions», dentro de cada ejecución | pestaña «Releases» |
+| Cuánto dura | se borra a los 90 días | permanente |
+| Quién descarga | solo con sesión iniciada en GitHub | cualquiera |
+| Formato | siempre `.zip` impuesto por GitHub | los archivos tal como se subieron |
+| Para qué | probar una construcción | distribuir |
 
 Para entregarle el programa a un colega, tiene que ser una release. Un
 artefacto es material de trabajo interno.
@@ -657,14 +657,180 @@ Por consola, con la herramienta oficial `gh`:
 
 ```bash
 gh release create v1.0 \
-    pdf_word_finder-linux-x64.tar.gz \
-    pdf_word_finder-windows-x64.zip \
-    --title "pdf_word_finder 1.0" \
+    pdf-word-finder-linux-x64.tar.gz \
+    pdf-word-finder-windows-x64.zip \
+    --title "pdf-word-finder 1.0" \
     --notes "Primera versión pública."
 ```
 
 En ambos casos recuerde que los paquetes deben construirse en cada sistema
-operativo, de modo que a mano solo podrá adjuntar el de la máquina que tenga delante.
+operativo, de modo que a mano solo podrá adjuntar el de la máquina que tenga
+delante.
+
+### Si Windows o macOS se resisten a abrirlo
+
+Los ejecutables van sin firma digital, y los dos sistemas lo notan. En macOS,
+Gatekeeper se negará a abrir la aplicación: la salida es hacer clic derecho
+sobre ella y elegir «Abrir», que ofrece una excepción por única vez. En
+Linux no hay obstáculo; basta `chmod +x`. Windows merece apartado aparte.
+
+#### En Windows 11
+
+Esto es lo que hay que explicarle a quien reciba el programa. Conviene
+pegarlo tal cual en el correo, porque quien no lo sepa suele concluir que el
+archivo está dañado y lo borra.
+
+**1. Desbloquear el archivo.** Windows marca todo lo que llega de internet
+con un distintivo invisible, y es ese distintivo —no el programa— lo que
+dispara la advertencia. Clic derecho → Propiedades → abajo del todo, casilla
+**«Desbloquear»** → Aceptar.
+
+Si lo que recibió es un `.zip`, conviene desbloquearlo **antes** de
+descomprimirlo: así se limpia todo su contenido de una vez y no hay que
+repetir la operación con cada archivo extraído. Si es un `.exe` suelto, se
+hace sobre él directamente.
+
+Hecho esto, lo corriente es que el aviso del punto siguiente ya no aparezca:
+desbloquear es justamente quitarle a Windows el motivo para desconfiar. El
+punto 2 queda por si acaso.
+
+**2. Al ejecutarlo aparecerá una pantalla azul** que dice «Windows protegió
+su PC». No es un error ni un virus: es el aviso de editor desconocido. Se
+pulsa **«Más información»** —y solo entonces aparece el botón—
+**«Ejecutar de todas formas»**.
+
+Con eso basta la primera vez; después abre sin preguntar nada.
+
+Si prefiere hacerlo desde PowerShell, una orden reemplaza al primer paso:
+
+```powershell
+Unblock-File .\pdf-word-finder-gui.exe        # un archivo suelto
+Get-ChildItem -Recurse .\pdf-word-finder | Unblock-File   # una carpeta
+```
+
+Dos situaciones en las que lo anterior no funciona, ambas propias de
+Windows 11:
+
+* **Smart App Control.** Es una protección que viene activa en algunas
+  instalaciones limpias de Windows 11 y bloquea sin apelación todo programa
+  sin firmar: no ofrece un «ejecutar de todas formas». Se comprueba en
+  Seguridad de Windows → Control de aplicaciones y explorador. Desactivarlo
+  es **irreversible** —no puede volver a encenderse sin reinstalar el
+  sistema—, de modo que no es algo que convenga pedirle a nadie. Si el
+  destinatario lo tiene activo, lo sensato es darle los archivos `.py` y que
+  instale Python.
+
+* **Modo S.** Solo admite programas de la Microsoft Store. Salir del modo S
+  es gratuito pero también irreversible.
+
+Si además el antivirus pone en cuarentena el archivo —cosa distinta del
+aviso anterior—, hay que restaurarlo desde Seguridad de Windows → Protección
+antivirus y contra amenazas → Historial de protección, o excluir la carpeta.
+Las exclusiones bajan la guardia del sistema en esa carpeta, así que conviene
+usarlas solo sobre una que uno controle, y no sobre Descargas.
+
+Nótese que nada de esto ocurre con los ejecutables que usted mismo construya
+en su máquina: el distintivo lo pone la descarga, no el programa. Solo lo
+verán quienes lo reciban por internet.
+
+> **Conviene distribuirlo dentro de un `.zip` y no como `.exe` suelto.** No
+> es por comodidad: un `.exe` desnudo tropieza además con obstáculos previos
+> a Windows. Chrome y Edge lo señalan en la barra de descargas y exigen un
+> «Conservar de todos modos» adicional, y la mayoría de los correos
+> —Outlook y Gmail entre ellos— rechazan de plano los adjuntos ejecutables,
+> a veces sin avisar al remitente. Comprimido no ocurre ninguna de las dos
+> cosas. Por eso el flujo de trabajo de GitHub empaqueta antes de publicar.
+
+#### El otro problema: los antivirus
+
+Distinto del aviso anterior, y más molesto, es que los ejecutables hechos con
+PyInstaller disparan **falsos positivos** en algunos antivirus. La razón es
+estructural: un ejecutable de un solo archivo se descomprime en una carpeta
+temporal y ejecuta código desde ahí, que es exactamente lo que hace cierto
+programa malicioso.
+
+Dos paliativos gratuitos:
+
+* **Construir en modo carpeta**, que es lo que la receta hace por omisión
+  precisamente por esto. Véase «Carpeta o archivo único», más arriba.
+
+* **Reportar el falso positivo.** Microsoft y los demás fabricantes tienen
+  formularios para ello y suelen corregirlo en días.
+
+### Para colegas en Windows: el camino sin ejecutable
+
+Windows Defender bloquea con cierta frecuencia los ejecutables hechos con
+PyInstaller, y el mensaje con que lo hace —«Windows no puede acceder al
+archivo especificado»— parece un problema de permisos y no lo es. Reportar el
+falso positivo a Microsoft lo corrige para todo el mundo en unos días, pero
+entretanto sus colegas no pueden abrir el programa, y en equipos
+administrados por la universidad puede que no se corrija nunca.
+
+El camino que no depende de nada de eso es no distribuir un ejecutable.
+Python es gratuito, se instala desde la Microsoft Store sin permisos de
+administrador, y ningún antivirus objeta un archivo `.py`.
+
+Para que a un colega no le cueste más que un doble clic, el proyecto incluye
+`pdf-word-finder.bat`. Se distribuye un `.zip` con tres archivos:
+
+```
+pdf_word_finder.py
+pdf_word_finder_gui.py
+pdf-word-finder.bat
+```
+
+y la instrucción es: descomprimir y hacer doble clic en el `.bat`.
+
+El lanzador se encarga de todo lo demás. Si falta `pypdf`, lo instala sin
+preguntar —es cuestión de segundos y no tiene contrapartida—. Si falta
+Python, en cambio, **pide permiso antes**: instalar un programa de 100 MB en
+el equipo de otro no es algo que deba ocurrir por sorpresa. Aceptado eso,
+intenta primero con `winget`, que viene incluido en Windows 11 y no obliga al
+usuario a elegir nada; si no está disponible o falla, abre la Microsoft Store
+en la página de Python y explica los tres pasos que hay que dar allí.
+
+Tras instalar Python hay que cerrar la ventana y volver a hacer doble clic.
+No es descuido: una ventana de consola hereda la lista de programas del
+sistema al abrirse y no la actualiza, de modo que no puede ver un Python que
+acaba de aparecer. El lanzador lo dice con esas palabras, para que nadie
+concluya que algo salió mal.
+
+Si algo falla —falta `tkinter`, o pip no puede salir a la red por el
+proxy— lo dice en castellano y explica qué hacer, en vez de cerrarse sin
+más.
+
+Tres detalles de ese archivo que conviene no «arreglar»:
+
+* **Está escrito sin tildes.** La consola de Windows no usa UTF-8 por
+  omisión y los acentos saldrían ilegibles. Es fealdad deliberada.
+
+* **Lleva finales de renglón CRLF**, que es lo que exige el formato `.bat`.
+  Si lo edita en un editor de Linux o macOS, conserve ese detalle.
+
+* **Abre la ventana con `pythonw`** y no con `python`, para que no quede
+  detrás una ventana negra de consola.
+
+Y un detalle que sí conviene revisar de vez en cuando: el lanzador pide a
+`winget` la versión `Python.Python.3.12`. Ese identificador envejece. Cuando
+3.12 quede muy atrás, basta cambiar ese número en el `.bat`; si no se hace,
+tampoco es grave, porque el programa recurre entonces a la Microsoft Store.
+
+### Alternativas más ligeras
+
+Si el destinatario tiene Python, hay caminos más sencillos que un ejecutable
+de 20 MB:
+
+* **Los archivos sueltos.** Cuatro archivos y `pip install pypdf`. Para
+  colegas con soltura técnica es lo más simple.
+
+* **Un archivo `.pyz`.** `zipapp` empaqueta todo en un solo archivo
+  ejecutable por Python, de unos pocos KB. Requiere Python en la máquina de
+  destino, pero se distribuye como una unidad.
+
+* **Un paquete instalable.** Con un `pyproject.toml` mínimo y un punto de
+  entrada de consola, `pipx install` deja la orden `pdf-word-finder`
+  disponible en todo el sistema. Es lo indicado si algún día publica el
+  programa en PyPI, y los nombres actuales ya sirven tal cual.
 
 ---
 
@@ -677,7 +843,7 @@ python pdf_word_finder.py --version
 ```
 
 ```
-pdf_word_finder 1.0 — © Nicolás Vaughan 2026 — licencia MIT
+pdf-word-finder 1.0 — © Nicolás Vaughan 2026 — licencia MIT
 ```
 
 En el código está declarada una sola vez, en `__version__`, y de ahí la toma
