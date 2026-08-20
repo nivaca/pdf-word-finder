@@ -871,3 +871,4 @@ ejecutables,
 porque el aviso de copyright que llevan incorporado los dos programas remite
 al último, y la interfaz gráfica no funciona sin el programa de línea de
 órdenes en la misma carpeta.
+
