@@ -4,6 +4,8 @@ rem  pdf-word-finder - lanzador para Windows
 rem
 rem  Se hace doble clic en este archivo y se abre la ventana del programa.
 rem  Si falta Python, se ofrece instalarlo; si falta pypdf, se instala solo.
+rem  Tras instalar Python el lanzador sigue adelante sin que haya que
+rem  volver a empezar.
 rem
 rem  (c) Nicolas Vaughan 2026. Licencia MIT.
 rem ---------------------------------------------------------------------
@@ -20,29 +22,33 @@ if not exist "pdf_word_finder_gui.py" goto :sin_programa
 if not exist "pdf_word_finder.py" goto :sin_programa
 
 rem --- localizar Python -------------------------------------------------
-rem  El lanzador "py" viene con la instalacion oficial; "python" a secas
-rem  es lo que deja la version de la Microsoft Store.
-
 call :buscar_python
-if not defined PY goto :ofrecer_python
+if defined PY goto :con_python
 
-rem --- comprobar tkinter ------------------------------------------------
+call :instalar_python
+if defined PY goto :con_python
+goto :fin_sin_python
+
+
+rem =====================================================================
+rem  Con Python ya disponible: dependencia y arranque
+rem =====================================================================
+:con_python
+
 %PY% -c "import tkinter" >nul 2>&1
 if errorlevel 1 goto :sin_tkinter
 
-rem --- instalar pypdf la primera vez ------------------------------------
 %PY% -c "import pypdf" >nul 2>&1
 if errorlevel 1 (
     echo.
-    echo Preparando el programa. Esto solo ocurre la primera vez...
+    echo   Preparando el programa. Esto solo ocurre la primera vez...
     echo.
     %PY% -m pip install --user pypdf
     if errorlevel 1 goto :fallo_pip
     echo.
-    echo Listo.
+    echo   Listo.
 )
 
-rem --- abrir la ventana -------------------------------------------------
 rem  "pythonw" en vez de "python" para que no quede detras una ventana
 rem  negra de consola.
 start "" %PYW% "pdf_word_finder_gui.py"
@@ -61,13 +67,34 @@ set "PY="
 set "PYW="
 py -3 -c "import sys" >nul 2>&1 && (set "PY=py -3" & set "PYW=pyw -3" & exit /b 0)
 python -c "import sys" >nul 2>&1 && (set "PY=python" & set "PYW=pythonw" & exit /b 0)
+
+rem  Recien instalado, Python aun no figura en el PATH de esta ventana:
+rem  la lista de programas se hereda al abrirla y no se actualiza sola.
+rem  Se busca entonces en las carpetas donde suele quedar.
+rem
+rem  Se recorre una lista explicita de versiones, de mayor a menor, y NO
+rem  el orden alfabetico que daria "dir /o-n": alfabeticamente "Python39"
+rem  va despues de "Python313", de modo que se elegiria la version vieja.
+for %%n in (319 318 317 316 315 314 313 312 311 310) do (
+    if not defined PY if exist "%LOCALAPPDATA%\Programs\Python\Python%%n\python.exe" (
+        set PY="%LOCALAPPDATA%\Programs\Python\Python%%n\python.exe"
+    )
+    if not defined PY if exist "%ProgramFiles%\Python%%n\python.exe" (
+        set PY="%ProgramFiles%\Python%%n\python.exe"
+    )
+)
+if not defined PY exit /b 0
+
+rem  El pythonw de al lado, para abrir sin ventana de consola detras.
+for %%q in (%PY%) do set PYW="%%~dpqpythonw.exe"
+for %%q in (%PYW%) do if not exist "%%~q" set PYW=%PY%
 exit /b 0
 
 
 rem =====================================================================
 rem  Instalacion de Python
 rem =====================================================================
-:ofrecer_python
+:instalar_python
 echo.
 echo ============================================================
 echo   pdf-word-finder necesita Python
@@ -77,17 +104,11 @@ echo   Python es un programa gratuito de uso corriente. Ocupa unos
 echo   100 MB y se instala en dos o tres minutos.
 echo.
 choice /C SN /N /M "   Desea instalarlo ahora? (S/N): "
-if errorlevel 2 goto :cancelado
+if errorlevel 2 exit /b 0
 
-rem  Se prueba winget, que viene con Windows 11 y no necesita que el
-rem  usuario elija nada. Si no esta, o falla, se recurre a la Store.
 where winget >nul 2>&1
 if errorlevel 1 goto :via_store
 
-echo.
-echo   Instalando Python. Puede tardar unos minutos...
-echo   (Si Windows pide permiso, acepte.)
-echo.
 rem  winget identifica cada serie de Python por separado (Python.Python.3.14,
 rem  .3.15...), de modo que no hay un identificador generico que signifique
 rem  "la mas reciente". Se prueban de mayor a menor y se toma la primera que
@@ -102,12 +123,10 @@ for %%v in (3.19 3.18 3.17 3.16 3.15 3.14 3.13 3.12) do (
 )
 if not defined PYID goto :via_store
 
-echo   Version encontrada: %PYID%
 echo.
-
-rem  Primero por ambito de usuario, que no pide permisos de administrador.
-rem  Algunos paquetes no lo admiten; entonces se reintenta del modo normal,
-rem  que puede pedir permiso. Si tampoco, queda la Store.
+echo   Instalando %PYID%. Puede tardar unos minutos...
+echo   (Si Windows pide permiso, acepte.)
+echo.
 winget install --id %PYID% --exact --scope user --accept-package-agreements --accept-source-agreements
 if errorlevel 1 (
     echo.
@@ -115,13 +134,14 @@ if errorlevel 1 (
     echo.
     winget install --id %PYID% --exact --accept-package-agreements --accept-source-agreements
 )
-if errorlevel 1 goto :via_store
 
-rem  winget puede terminar bien y aun asi no dejar Python utilizable en
-rem  esta ventana. Se comprueba de veras antes de cantar victoria.
 call :buscar_python
-if not defined PY goto :reabrir
-goto :reabrir
+if defined PY (
+    echo.
+    echo   Python instalado. Continuando...
+    echo.
+)
+exit /b 0
 
 :via_store
 echo.
@@ -129,47 +149,31 @@ echo   Se abrira la Microsoft Store en la pagina de Python.
 echo.
 echo     1. Pulse "Obtener" o "Instalar".
 echo     2. Espere a que termine.
-echo     3. Cierre la Store y vuelva aqui.
+echo     3. Cierre la Store y vuelva a esta ventana.
 echo.
 pause
 rem  Sin espacios ni codificacion en la direccion: menos que pueda fallar.
 start "" "ms-windows-store://search?query=python"
 echo.
-echo   Cuando haya terminado la instalacion, cierre esta ventana y
-echo   vuelva a hacer doble clic en pdf-word-finder.bat
-echo.
 pause
-exit /b 1
-
-:reabrir
-echo.
-echo ============================================================
-echo   Python quedo instalado.
-echo ============================================================
-echo.
-echo   Cierre esta ventana y vuelva a hacer doble clic en
-echo   pdf-word-finder.bat para abrir el programa.
-echo.
-echo   (Hace falta cerrarla porque Windows solo reconoce los
-echo   programas recien instalados en ventanas nuevas.)
-echo.
-pause
+call :buscar_python
 exit /b 0
 
-:cancelado
+
+rem =====================================================================
+rem  Salidas con explicacion
+rem =====================================================================
+:fin_sin_python
 echo.
-echo   De acuerdo, no se instalo nada.
+echo   No se pudo dejar Python listo en esta ventana.
 echo.
-echo   Sin Python este lanzador no puede abrir el programa. La otra
-echo   via es pedirle a quien se lo envio la version ejecutable.
+echo   Si acaba de instalarlo, cierre esta ventana y vuelva a hacer
+echo   doble clic en pdf-word-finder.bat: en una ventana nueva
+echo   Windows ya lo reconoce.
 echo.
 pause
 exit /b 1
 
-
-rem =====================================================================
-rem  Errores
-rem =====================================================================
 :sin_tkinter
 echo.
 echo   Se encontro Python, pero le falta el componente "tkinter",

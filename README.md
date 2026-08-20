@@ -19,13 +19,13 @@ que está realmente impreso en la página, almacenado en el árbol
 `/PageLabels` del catálogo del documento. Ese árbol permite expresar todo lo
 que la tradición tipográfica exige:
 
-| Situación | Secuencial | Rotulada |
-|---|---|---|
-| Cubierta y portada sin numerar | 1, 2 | *(sin rótulo o «C-1»)* |
-| Preliminares en romanas bajas | 3–14 | i–xii |
-| Cuerpo de la obra | 15– | 1– |
-| Reinicio en el segundo volumen | 320– | 1– |
-| Láminas intercaladas | 88 | «Lám. IV» |
+| Situación                      | Secuencial | Rotulada               |
+|--------------------------------|------------|------------------------|
+| Cubierta y portada sin numerar | 1, 2       | *(sin rótulo o «C-1»)* |
+| Preliminares en romanas bajas  | 3–14       | i–xii                  |
+| Cuerpo de la obra              | 15–        | 1–                     |
+| Reinicio en el segundo volumen | 320–       | 1–                     |
+| Láminas intercaladas           | 88         | «Lám. IV»              |
 
 En una edición corriente, entonces, la página **secuencial 15** es la
 **rotulada 1**: un desfase de catorce unidades que hace inservible cualquier
@@ -212,13 +212,13 @@ python pdf_word_finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
 
 Algunos patrones útiles para trabajo filológico:
 
-| Patrón | Encuentra |
-|---|---|
-| `re:\bMarcolph\w*` | todas las formas flexivas de un nombre propio |
-| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional |
-| `re:\d{1,2}[.,]\s*\d+` | referencias del tipo «12, 34» |
-| `re:[A-Z]{2,}` | versalitas y siglas transcritas en mayúsculas |
-| `re:qu[oa]d\s+\w+` | una colocación sintáctica |
+| Patrón                  | Encuentra                                     |
+|-------------------------|-----------------------------------------------|
+| `re:\bMarcolph\w*`      | todas las formas flexivas de un nombre propio |
+| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional       |
+| `re:\d{1,2}[.,]\s*\d+`  | referencias del tipo «12, 34»                 |
+| `re:[A-Z]{2,}`          | versalitas y siglas transcritas en mayúsculas |
+| `re:qu[oa]d\s+\w+`      | una colocación sintáctica                     |
 
 Por omisión los patrones **no** se delimitan: quien escribe la expresión
 decide dónde empieza y dónde termina. Si se prefiere que reciban los mismos
@@ -245,22 +245,22 @@ siempre en inglés; no está en mi mano traducirla.
 
 ## 6. Opciones
 
-| Opción | Efecto |
-|---|---|
-| `--words-file ARCHIVO` | lee términos adicionales de un archivo |
-| `--regex` | trata todos los términos como expresiones regulares |
-| `--regex-word` | aplica límites de palabra también a las expresiones |
-| `--substring` | busca también dentro de las palabras |
-| `--case-sensitive` | distingue mayúsculas de minúsculas |
-| `--ignore-accents` | ignora los signos diacríticos |
-| `--no-dehyphenate` | conserva la división silábica de fin de renglón |
-| `--show-logical` | añade la página secuencial entre corchetes |
-| `--detailed` | informe extenso en vez de la lista compacta |
-| `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
-| `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
-| `--sort` | ordena la lista alfabéticamente |
-| `--txt ARCHIVO` | exporta la lista alfabetizada a un archivo de texto |
-| `--csv ARCHIVO` | escribe además los resultados en un CSV |
+| Opción                 | Efecto                                                        |
+|------------------------|---------------------------------------------------------------|
+| `--words-file ARCHIVO` | lee términos adicionales de un archivo                        |
+| `--regex`              | trata todos los términos como expresiones regulares           |
+| `--regex-word`         | aplica límites de palabra también a las expresiones           |
+| `--substring`          | busca también dentro de las palabras                          |
+| `--case-sensitive`     | distingue mayúsculas de minúsculas                            |
+| `--ignore-accents`     | ignora los signos diacríticos                                 |
+| `--no-dehyphenate`     | conserva la división silábica de fin de renglón               |
+| `--show-logical`       | añade la página secuencial entre corchetes                    |
+| `--detailed`           | informe extenso en vez de la lista compacta                   |
+| `--context`            | muestra un fragmento de cada aparición (implica `--detailed`) |
+| `--context-width N`    | anchura del fragmento (60 caracteres por omisión)             |
+| `--sort`               | ordena la lista alfabéticamente                               |
+| `--txt ARCHIVO`        | exporta la lista alfabetizada a un archivo de texto           |
+| `--csv ARCHIVO`        | escribe además los resultados en un CSV                       |
 
 Los nombres de las opciones se dejaron en inglés a propósito, porque es la
 convención de las herramientas de línea de órdenes y porque así se pueden
@@ -532,9 +532,9 @@ primero es de velocidad: el ejecutable único se descomprime en una carpeta
 temporal **en cada ejecución**. Medido en esta misma máquina, arrancar y
 mostrar la versión:
 
-| | Modo carpeta | Archivo único |
-|---|---|---|
-| arranque | 79 ms | 264 ms |
+|          | Modo carpeta | Archivo único |
+|----------|--------------|---------------|
+| arranque | 79 ms        | 264 ms        |
 
 El segundo precio es peor: descomprimirse solo en una carpeta temporal y
 ejecutar código desde allí es, estructuralmente, lo que hace cierto programa
@@ -609,13 +609,13 @@ etiqueta.
 Conviene tener clara la distinción, porque GitHub usa las dos palabras y son
 cosas distintas:
 
-| | Artefacto | Release |
-|---|---|---|
-| Dónde | pestaña «Actions», dentro de cada ejecución | pestaña «Releases» |
-| Cuánto dura | se borra a los 90 días | permanente |
-| Quién descarga | solo con sesión iniciada en GitHub | cualquiera |
-| Formato | siempre `.zip` impuesto por GitHub | los archivos tal como se subieron |
-| Para qué | probar una construcción | distribuir |
+|                | Artefacto                                   | Release                           |
+|----------------|---------------------------------------------|-----------------------------------|
+| Dónde          | pestaña «Actions», dentro de cada ejecución | pestaña «Releases»                |
+| Cuánto dura    | se borra a los 90 días                      | permanente                        |
+| Quién descarga | solo con sesión iniciada en GitHub          | cualquiera                        |
+| Formato        | siempre `.zip` impuesto por GitHub          | los archivos tal como se subieron |
+| Para qué       | probar una construcción                     | distribuir                        |
 
 Para entregarle el programa a un colega, tiene que ser una release. Un
 artefacto es material de trabajo interno.
@@ -837,25 +837,7 @@ de 20 MB:
 
 ---
 
-## 12. Versión
-
-Versión **1.2**. La cifra se consulta desde el propio programa:
-
-```bash
-python pdf_word_finder.py --version
-```
-
-```
-pdf-word-finder 1.2 — © Nicolás Vaughan 2026 — licencia MIT
-```
-
-En el código está declarada una sola vez, en `__version__`, y de ahí la toma
-tanto `--version` como el encabezado. Al modificar el programa basta con
-cambiarla en ese único lugar.
-
----
-
-## 13. Licencia y autoría
+## 12. Licencia y autoría
 
 © Nicolás Vaughan 2026.
 
