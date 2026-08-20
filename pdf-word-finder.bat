@@ -53,10 +53,14 @@ rem =====================================================================
 rem  Subrutina: deja PY y PYW definidos, o vacios si no hay Python
 rem =====================================================================
 :buscar_python
+rem  No se usa "where": Windows 11 trae un "python" de mentira, un archivo
+rem  vacio en WindowsApps cuyo unico oficio es abrir la Store. "where" lo
+rem  encuentra y uno creeria que hay Python. Por eso se comprueba
+rem  EJECUTANDOLO: solo un Python de verdad responde sin error.
 set "PY="
 set "PYW="
-where py >nul 2>&1 && (set "PY=py -3" & set "PYW=pyw -3" & exit /b 0)
-where python >nul 2>&1 && (set "PY=python" & set "PYW=pythonw" & exit /b 0)
+py -3 -c "import sys" >nul 2>&1 && (set "PY=py -3" & set "PYW=pyw -3" & exit /b 0)
+python -c "import sys" >nul 2>&1 && (set "PY=python" & set "PYW=pythonw" & exit /b 0)
 exit /b 0
 
 
@@ -84,8 +88,22 @@ echo.
 echo   Instalando Python. Puede tardar unos minutos...
 echo   (Si Windows pide permiso, acepte.)
 echo.
-winget install --id Python.Python.3.12 --exact --scope user --silent --accept-package-agreements --accept-source-agreements
+rem  Primero por ambito de usuario, que no pide permisos de administrador.
+rem  Algunos paquetes no lo admiten; entonces se reintenta del modo normal,
+rem  que puede pedir permiso. Si tampoco, queda la Store.
+winget install --id Python.Python.3.12 --exact --scope user --accept-package-agreements --accept-source-agreements
+if errorlevel 1 (
+    echo.
+    echo   Reintentando de otro modo. Si Windows pide permiso, acepte.
+    echo.
+    winget install --id Python.Python.3.12 --exact --accept-package-agreements --accept-source-agreements
+)
 if errorlevel 1 goto :via_store
+
+rem  winget puede terminar bien y aun asi no dejar Python utilizable en
+rem  esta ventana. Se comprueba de veras antes de cantar victoria.
+call :buscar_python
+if not defined PY goto :reabrir
 goto :reabrir
 
 :via_store
@@ -97,7 +115,8 @@ echo     2. Espere a que termine.
 echo     3. Cierre la Store y vuelva aqui.
 echo.
 pause
-start "" "ms-windows-store://search/?query=Python 3.12"
+rem  Sin espacios ni codificacion en la direccion: menos que pueda fallar.
+start "" "ms-windows-store://search?query=python"
 echo.
 echo   Cuando haya terminado la instalacion, cierre esta ventana y
 echo   vuelva a hacer doble clic en pdf-word-finder.bat
