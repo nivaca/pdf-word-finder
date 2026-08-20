@@ -1,6 +1,6 @@
 # pdf-word-finder
 
-**Versión 1.2** · © Nicolás Vaughan 2026 · Licencia MIT
+**Versión 1.4** · © Nicolás Vaughan 2026 · Licencia MIT
 
 Busca una lista de palabras, frases o expresiones regulares dentro de un
 archivo PDF e informa **en qué páginas aparece cada una**, distinguiendo
@@ -19,13 +19,13 @@ que está realmente impreso en la página, almacenado en el árbol
 `/PageLabels` del catálogo del documento. Ese árbol permite expresar todo lo
 que la tradición tipográfica exige:
 
-| Situación                      | Secuencial | Rotulada               |
-|--------------------------------|------------|------------------------|
-| Cubierta y portada sin numerar | 1, 2       | *(sin rótulo o «C-1»)* |
-| Preliminares en romanas bajas  | 3–14       | i–xii                  |
-| Cuerpo de la obra              | 15–        | 1–                     |
-| Reinicio en el segundo volumen | 320–       | 1–                     |
-| Láminas intercaladas           | 88         | «Lám. IV»              |
+| Situación | Secuencial | Rotulada |
+|---|---|---|
+| Cubierta y portada sin numerar | 1, 2 | *(sin rótulo o «C-1»)* |
+| Preliminares en romanas bajas | 3–14 | i–xii |
+| Cuerpo de la obra | 15– | 1– |
+| Reinicio en el segundo volumen | 320– | 1– |
+| Láminas intercaladas | 88 | «Lám. IV» |
 
 En una edición corriente, entonces, la página **secuencial 15** es la
 **rotulada 1**: un desfase de catorce unidades que hace inservible cualquier
@@ -212,13 +212,13 @@ python pdf_word_finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
 
 Algunos patrones útiles para trabajo filológico:
 
-| Patrón                  | Encuentra                                     |
-|-------------------------|-----------------------------------------------|
-| `re:\bMarcolph\w*`      | todas las formas flexivas de un nombre propio |
-| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional       |
-| `re:\d{1,2}[.,]\s*\d+`  | referencias del tipo «12, 34»                 |
-| `re:[A-Z]{2,}`          | versalitas y siglas transcritas en mayúsculas |
-| `re:qu[oa]d\s+\w+`      | una colocación sintáctica                     |
+| Patrón | Encuentra |
+|---|---|
+| `re:\bMarcolph\w*` | todas las formas flexivas de un nombre propio |
+| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional |
+| `re:\d{1,2}[.,]\s*\d+` | referencias del tipo «12, 34» |
+| `re:[A-Z]{2,}` | versalitas y siglas transcritas en mayúsculas |
+| `re:qu[oa]d\s+\w+` | una colocación sintáctica |
 
 Por omisión los patrones **no** se delimitan: quien escribe la expresión
 decide dónde empieza y dónde termina. Si se prefiere que reciban los mismos
@@ -245,22 +245,22 @@ siempre en inglés; no está en mi mano traducirla.
 
 ## 6. Opciones
 
-| Opción                 | Efecto                                                        |
-|------------------------|---------------------------------------------------------------|
-| `--words-file ARCHIVO` | lee términos adicionales de un archivo                        |
-| `--regex`              | trata todos los términos como expresiones regulares           |
-| `--regex-word`         | aplica límites de palabra también a las expresiones           |
-| `--substring`          | busca también dentro de las palabras                          |
-| `--case-sensitive`     | distingue mayúsculas de minúsculas                            |
-| `--ignore-accents`     | ignora los signos diacríticos                                 |
-| `--no-dehyphenate`     | conserva la división silábica de fin de renglón               |
-| `--show-logical`       | añade la página secuencial entre corchetes                    |
-| `--detailed`           | informe extenso en vez de la lista compacta                   |
-| `--context`            | muestra un fragmento de cada aparición (implica `--detailed`) |
-| `--context-width N`    | anchura del fragmento (60 caracteres por omisión)             |
-| `--sort`               | ordena la lista alfabéticamente                               |
-| `--txt ARCHIVO`        | exporta la lista alfabetizada a un archivo de texto           |
-| `--csv ARCHIVO`        | escribe además los resultados en un CSV                       |
+| Opción | Efecto |
+|---|---|
+| `--words-file ARCHIVO` | lee términos adicionales de un archivo |
+| `--regex` | trata todos los términos como expresiones regulares |
+| `--regex-word` | aplica límites de palabra también a las expresiones |
+| `--substring` | busca también dentro de las palabras |
+| `--case-sensitive` | distingue mayúsculas de minúsculas |
+| `--ignore-accents` | ignora los signos diacríticos |
+| `--no-dehyphenate` | conserva la división silábica de fin de renglón |
+| `--show-logical` | añade la página secuencial entre corchetes |
+| `--detailed` | informe extenso en vez de la lista compacta |
+| `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
+| `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
+| `--sort` | ordena la lista alfabéticamente |
+| `--txt ARCHIVO` | exporta la lista alfabetizada a un archivo de texto |
+| `--csv ARCHIVO` | escribe además los resultados en un CSV |
 
 Los nombres de las opciones se dejaron en inglés a propósito, porque es la
 convención de las herramientas de línea de órdenes y porque así se pueden
@@ -532,9 +532,9 @@ primero es de velocidad: el ejecutable único se descomprime en una carpeta
 temporal **en cada ejecución**. Medido en esta misma máquina, arrancar y
 mostrar la versión:
 
-|          | Modo carpeta | Archivo único |
-|----------|--------------|---------------|
-| arranque | 79 ms        | 264 ms        |
+| | Modo carpeta | Archivo único |
+|---|---|---|
+| arranque | 79 ms | 264 ms |
 
 El segundo precio es peor: descomprimirse solo en una carpeta temporal y
 ejecutar código desde allí es, estructuralmente, lo que hace cierto programa
@@ -586,8 +586,8 @@ GitHub, sin necesidad de tener a mano un Windows y un Mac, y las adjunta a
 una *release*. Todo el procedimiento se reduce a etiquetar:
 
 ```bash
-git tag -a v1.2 -m "Versión 1.2"
-git push origin v1.2
+git tag -a v1.4 -m "Versión 1.4"
+git push origin v1.4
 ```
 
 Unos minutos después, en la pestaña «Releases» del repositorio aparece un
@@ -609,13 +609,13 @@ etiqueta.
 Conviene tener clara la distinción, porque GitHub usa las dos palabras y son
 cosas distintas:
 
-|                | Artefacto                                   | Release                           |
-|----------------|---------------------------------------------|-----------------------------------|
-| Dónde          | pestaña «Actions», dentro de cada ejecución | pestaña «Releases»                |
-| Cuánto dura    | se borra a los 90 días                      | permanente                        |
-| Quién descarga | solo con sesión iniciada en GitHub          | cualquiera                        |
-| Formato        | siempre `.zip` impuesto por GitHub          | los archivos tal como se subieron |
-| Para qué       | probar una construcción                     | distribuir                        |
+| | Artefacto | Release |
+|---|---|---|
+| Dónde | pestaña «Actions», dentro de cada ejecución | pestaña «Releases» |
+| Cuánto dura | se borra a los 90 días | permanente |
+| Quién descarga | solo con sesión iniciada en GitHub | cualquiera |
+| Formato | siempre `.zip` impuesto por GitHub | los archivos tal como se subieron |
+| Para qué | probar una construcción | distribuir |
 
 Para entregarle el programa a un colega, tiene que ser una release. Un
 artefacto es material de trabajo interno.
@@ -656,11 +656,11 @@ adjuntos → «Publish release».
 Por consola, con la herramienta oficial `gh`:
 
 ```bash
-gh release create v1.2 \
+gh release create v1.4 \
     pdf-word-finder-linux-x64.tar.gz \
     pdf-word-finder-windows-x64.zip \
-    --title "pdf-word-finder 1.2" \
-    --notes "Versión 1.2."
+    --title "pdf-word-finder 1.4" \
+    --notes "Versión 1.4."
 ```
 
 En ambos casos recuerde que los paquetes deben construirse en cada sistema
@@ -837,7 +837,50 @@ de 20 MB:
 
 ---
 
-## 12. Licencia y autoría
+## 12. Versión
+
+Versión **1.4**. La cifra se consulta desde el propio programa:
+
+```bash
+python pdf_word_finder.py --version
+```
+
+```
+pdf-word-finder 1.4 — © Nicolás Vaughan 2026 — licencia MIT
+```
+
+### Cambiar el número de versión
+
+El número vive en un solo lugar: `__version__`, en `pdf_word_finder.py`. La
+interfaz gráfica muestra `núcleo.__version__`, y la receta de PyInstaller lo
+lee del archivo al construir, de modo que ninguno de los dos puede quedarse
+atrás. El README es la excepción —menciona la cifra en varios sitios y no
+puede deducirla—, y para eso está `subir_version.py`:
+
+```bash
+python subir_version.py 1.3        # cambia la versión en todas partes
+python subir_version.py --mostrar  # dice cuál es la actual
+python subir_version.py --revisar  # comprueba que todo concuerde
+```
+
+El modo `--revisar` sirve como red de seguridad antes de etiquetar: devuelve
+un código de error si el README menciona una versión distinta de la del
+programa, de modo que puede llamarse desde un gancho de git o desde el flujo
+de trabajo.
+
+Los patrones del guion están anclados a su contexto —`**Versión X**`,
+`git tag -a X`, `pdf-word-finder X — ©`…— y no sustituyen cifras sueltas. Es
+deliberado: un «1.2» perdido en cualquier renglón podría ser otra cosa, y
+estropearlo sería difícil de advertir. Si añade al README una mención nueva
+de la versión con otra forma, conviene añadir también su patrón al guion.
+
+En el código está declarada una sola vez, en `__version__`, y de ahí la toma
+tanto `--version` como el encabezado. Al modificar el programa basta con
+cambiarla en ese único lugar.
+
+---
+
+## 13. Licencia y autoría
 
 © Nicolás Vaughan 2026.
 

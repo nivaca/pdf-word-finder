@@ -3,7 +3,6 @@
 pdf_word_finder.py — busca palabras o frases en un PDF e informa dónde
 aparecen.
 
-Versión 1.2
 © Nicolás Vaughan 2026. Distribuido bajo licencia MIT (véase LICENSE).
 
 Informa la página *rotulada* de cada aparición: el número realmente impreso
@@ -54,7 +53,7 @@ Opcional:  pip install pymupdf   (mejor extracción de texto; se usa si está)
 
 from __future__ import annotations
 
-__version__ = "1.23"
+__version__ = "1.4"
 __author__ = "Nicolás Vaughan"
 __copyright__ = "© Nicolás Vaughan 2026"
 __license__ = "MIT"
@@ -194,7 +193,7 @@ _WS_RE = re.compile(r"[ \t\r\f\v\u00a0]+")
 
 
 def strip_accents(s: str) -> str:
-    """Elimina los signos diacríticos: 'filología' -> 'filologia'."""
+    """Elimina los signos diacríticos: 'philología' -> 'philologia'."""
     return "".join(c for c in unicodedata.normalize("NFD", s)
                    if not unicodedata.combining(c))
 
