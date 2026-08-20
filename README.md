@@ -1,6 +1,6 @@
 # pdf-word-finder
 
-**Versión 1.0** · © Nicolás Vaughan 2026 · Licencia MIT
+**Versión 1.2** · © Nicolás Vaughan 2026 · Licencia MIT
 
 Busca una lista de palabras, frases o expresiones regulares dentro de un
 archivo PDF e informa **en qué páginas aparece cada una**, distinguiendo
@@ -586,8 +586,8 @@ GitHub, sin necesidad de tener a mano un Windows y un Mac, y las adjunta a
 una *release*. Todo el procedimiento se reduce a etiquetar:
 
 ```bash
-git tag -a v1.0 -m "Primera versión pública"
-git push origin v1.0
+git tag -a v1.2 -m "Versión 1.2"
+git push origin v1.2
 ```
 
 Unos minutos después, en la pestaña «Releases» del repositorio aparece un
@@ -638,7 +638,7 @@ Cuatro decisiones que conviene no deshacer sin saber por qué:
   de diagnosticar, porque la construcción no protesta.
 
 * **Se comprueba que la etiqueta y `__version__` concuerden**, y el flujo
-  falla si no. Una etiqueta `v1.1` sobre un código que se anuncia como 1.0
+  falla si no. Una etiqueta `v1.3` sobre un código que se anuncia como 1.2
   produce descargas que mienten sobre sí mismas, y eso no se puede corregir
   después: las releases publicadas no se editan sin romper los enlaces de
   quien ya descargó. Al subir la versión hay que tocar `__version__` en
@@ -656,11 +656,11 @@ adjuntos → «Publish release».
 Por consola, con la herramienta oficial `gh`:
 
 ```bash
-gh release create v1.0 \
+gh release create v1.2 \
     pdf-word-finder-linux-x64.tar.gz \
     pdf-word-finder-windows-x64.zip \
-    --title "pdf-word-finder 1.0" \
-    --notes "Primera versión pública."
+    --title "pdf-word-finder 1.2" \
+    --notes "Versión 1.2."
 ```
 
 En ambos casos recuerde que los paquetes deben construirse en cada sistema
@@ -836,14 +836,14 @@ de 20 MB:
 
 ## 12. Versión
 
-Versión **1.0**. La cifra se consulta desde el propio programa:
+Versión **1.2**. La cifra se consulta desde el propio programa:
 
 ```bash
 python pdf_word_finder.py --version
 ```
 
 ```
-pdf-word-finder 1.0 — © Nicolás Vaughan 2026 — licencia MIT
+pdf-word-finder 1.2 — © Nicolás Vaughan 2026 — licencia MIT
 ```
 
 En el código está declarada una sola vez, en `__version__`, y de ahí la toma

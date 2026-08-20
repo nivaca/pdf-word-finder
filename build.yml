@@ -55,7 +55,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
-          # Una etiqueta v1.1 sobre un código que se anuncia como 1.0 produce
+          # Una etiqueta v1.3 sobre un código que se anuncia como 1.2 produce
           # descargas que mienten sobre sí mismas. Más vale fallar aquí.
           # (Sin tildes en los nombres de variable: bash no las admite.)
           etiqueta="${GITHUB_REF_NAME#v}"

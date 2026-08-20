@@ -2,7 +2,7 @@
 """
 pdf_word_finder_gui.py — interfaz gráfica sencilla para pdf_word_finder.py.
 
-Versión 1.0
+Versión 1.2
 © Nicolás Vaughan 2026. Distribuido bajo licencia MIT (véase LICENSE).
 
 No duplica nada del programa de línea de órdenes: importa
