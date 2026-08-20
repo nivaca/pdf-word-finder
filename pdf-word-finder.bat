@@ -88,15 +88,32 @@ echo.
 echo   Instalando Python. Puede tardar unos minutos...
 echo   (Si Windows pide permiso, acepte.)
 echo.
+rem  winget identifica cada serie de Python por separado (Python.Python.3.14,
+rem  .3.15...), de modo que no hay un identificador generico que signifique
+rem  "la mas reciente". Se prueban de mayor a menor y se toma la primera que
+rem  exista en el catalogo: asi el lanzador no envejece cada vez que sale una
+rem  version nueva. Si algun dia hiciera falta, basta anadir numeros al
+rem  principio de esta lista.
+set "PYID="
+for %%v in (3.19 3.18 3.17 3.16 3.15 3.14 3.13 3.12) do (
+    if not defined PYID (
+        winget show --id Python.Python.%%v --exact >nul 2>&1 && set "PYID=Python.Python.%%v"
+    )
+)
+if not defined PYID goto :via_store
+
+echo   Version encontrada: %PYID%
+echo.
+
 rem  Primero por ambito de usuario, que no pide permisos de administrador.
 rem  Algunos paquetes no lo admiten; entonces se reintenta del modo normal,
 rem  que puede pedir permiso. Si tampoco, queda la Store.
-winget install --id Python.Python.3.12 --exact --scope user --accept-package-agreements --accept-source-agreements
+winget install --id %PYID% --exact --scope user --accept-package-agreements --accept-source-agreements
 if errorlevel 1 (
     echo.
     echo   Reintentando de otro modo. Si Windows pide permiso, acepte.
     echo.
-    winget install --id Python.Python.3.12 --exact --accept-package-agreements --accept-source-agreements
+    winget install --id %PYID% --exact --accept-package-agreements --accept-source-agreements
 )
 if errorlevel 1 goto :via_store
 

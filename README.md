@@ -1,4 +1,4 @@
-# pdf_word_finder
+# pdf-word-finder
 
 **Versión 1.2** · © Nicolás Vaughan 2026 · Licencia MIT
 
@@ -19,13 +19,13 @@ que está realmente impreso en la página, almacenado en el árbol
 `/PageLabels` del catálogo del documento. Ese árbol permite expresar todo lo
 que la tradición tipográfica exige:
 
-| Situación                      | Secuencial | Rotulada               |
-|--------------------------------|------------|------------------------|
-| Cubierta y portada sin numerar | 1, 2       | *(sin rótulo o «C-1»)* |
-| Preliminares en romanas bajas  | 3–14       | i–xii                  |
-| Cuerpo de la obra              | 15–        | 1–                     |
-| Reinicio en el segundo volumen | 320–       | 1–                     |
-| Láminas intercaladas           | 88         | «Lám. IV»              |
+| Situación | Secuencial | Rotulada |
+|---|---|---|
+| Cubierta y portada sin numerar | 1, 2 | *(sin rótulo o «C-1»)* |
+| Preliminares en romanas bajas | 3–14 | i–xii |
+| Cuerpo de la obra | 15– | 1– |
+| Reinicio en el segundo volumen | 320– | 1– |
+| Láminas intercaladas | 88 | «Lám. IV» |
 
 En una edición corriente, entonces, la página **secuencial 15** es la
 **rotulada 1**: un desfase de catorce unidades que hace inservible cualquier
@@ -101,16 +101,16 @@ del `PATH` —`~/.local/bin/`, por ejemplo—, o bien poner allí un enlace
 simbólico con el nombre corto de la orden:
 
 ```bash
-ln -s ~/proyectos/pdf_word_finder/pdf_word_finder.py ~/.local/bin/pdf_word_finder
+ln -s ~/proyectos/pdf-word-finder/pdf_word_finder.py ~/.local/bin/pdf-word-finder
 ```
 
-Así se escribe `pdf_word_finder libro.pdf amor` sin más.
+Así se escribe `pdf-word-finder libro.pdf amor` sin más.
 
 > **Nota sobre los nombres.** Los archivos fuente llevan guiones bajos
 > —`pdf_word_finder.py`— porque el guion no es un carácter válido en un
 > identificador de Python y un archivo llamado `pdf_word_finder.py` no podría
 > importarse con `import`. Los ejecutables y las órdenes de consola, en
-> cambio, llevan guiones: `pdf_word_finder`. No es una inconsecuencia sino la
+> cambio, llevan guiones: `pdf-word-finder`. No es una inconsecuencia sino la
 > convención corriente en Python, y trae una ventaja práctica: al ser el
 > núcleo un módulo importable de veras, la interfaz gráfica lo usa con un
 > `import` normal y el empaquetado para distribución no requiere artificio
@@ -212,13 +212,13 @@ python pdf_word_finder.py libro.pdf --regex "Marcolph\w*" "am(or|oris|orem)"
 
 Algunos patrones útiles para trabajo filológico:
 
-| Patrón                  | Encuentra                                     |
-|-------------------------|-----------------------------------------------|
-| `re:\bMarcolph\w*`      | todas las formas flexivas de un nombre propio |
-| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional       |
-| `re:\d{1,2}[.,]\s*\d+`  | referencias del tipo «12, 34»                 |
-| `re:[A-Z]{2,}`          | versalitas y siglas transcritas en mayúsculas |
-| `re:qu[oa]d\s+\w+`      | una colocación sintáctica                     |
+| Patrón | Encuentra |
+|---|---|
+| `re:\bMarcolph\w*` | todas las formas flexivas de un nombre propio |
+| `re:(?:im)?possibil\w+` | una familia léxica con prefijo opcional |
+| `re:\d{1,2}[.,]\s*\d+` | referencias del tipo «12, 34» |
+| `re:[A-Z]{2,}` | versalitas y siglas transcritas en mayúsculas |
+| `re:qu[oa]d\s+\w+` | una colocación sintáctica |
 
 Por omisión los patrones **no** se delimitan: quien escribe la expresión
 decide dónde empieza y dónde termina. Si se prefiere que reciban los mismos
@@ -245,22 +245,22 @@ siempre en inglés; no está en mi mano traducirla.
 
 ## 6. Opciones
 
-| Opción                 | Efecto                                                        |
-|------------------------|---------------------------------------------------------------|
-| `--words-file ARCHIVO` | lee términos adicionales de un archivo                        |
-| `--regex`              | trata todos los términos como expresiones regulares           |
-| `--regex-word`         | aplica límites de palabra también a las expresiones           |
-| `--substring`          | busca también dentro de las palabras                          |
-| `--case-sensitive`     | distingue mayúsculas de minúsculas                            |
-| `--ignore-accents`     | ignora los signos diacríticos                                 |
-| `--no-dehyphenate`     | conserva la división silábica de fin de renglón               |
-| `--show-logical`       | añade la página secuencial entre corchetes                    |
-| `--detailed`           | informe extenso en vez de la lista compacta                   |
-| `--context`            | muestra un fragmento de cada aparición (implica `--detailed`) |
-| `--context-width N`    | anchura del fragmento (60 caracteres por omisión)             |
-| `--sort`               | ordena la lista alfabéticamente                               |
-| `--txt ARCHIVO`        | exporta la lista alfabetizada a un archivo de texto           |
-| `--csv ARCHIVO`        | escribe además los resultados en un CSV                       |
+| Opción | Efecto |
+|---|---|
+| `--words-file ARCHIVO` | lee términos adicionales de un archivo |
+| `--regex` | trata todos los términos como expresiones regulares |
+| `--regex-word` | aplica límites de palabra también a las expresiones |
+| `--substring` | busca también dentro de las palabras |
+| `--case-sensitive` | distingue mayúsculas de minúsculas |
+| `--ignore-accents` | ignora los signos diacríticos |
+| `--no-dehyphenate` | conserva la división silábica de fin de renglón |
+| `--show-logical` | añade la página secuencial entre corchetes |
+| `--detailed` | informe extenso en vez de la lista compacta |
+| `--context` | muestra un fragmento de cada aparición (implica `--detailed`) |
+| `--context-width N` | anchura del fragmento (60 caracteres por omisión) |
+| `--sort` | ordena la lista alfabéticamente |
+| `--txt ARCHIVO` | exporta la lista alfabetizada a un archivo de texto |
+| `--csv ARCHIVO` | escribe además los resultados en un CSV |
 
 Los nombres de las opciones se dejaron en inglés a propósito, porque es la
 convención de las herramientas de línea de órdenes y porque así se pueden
@@ -511,7 +511,7 @@ pip install pyinstaller pypdf
 pyinstaller --clean --noconfirm pdf_word_finder.spec
 ```
 
-En `dist/pdf_word_finder/` quedan los dos programas —la interfaz gráfica y
+En `dist/pdf-word-finder/` quedan los dos programas —la interfaz gráfica y
 el de consola— junto a la subcarpeta `_internal/` con el intérprete y las
 bibliotecas que ambos comparten. Nada de eso requiere Python en la máquina
 de destino. La carpeta entera pesa unos 50 MB y **se distribuye completa,
@@ -532,9 +532,9 @@ primero es de velocidad: el ejecutable único se descomprime en una carpeta
 temporal **en cada ejecución**. Medido en esta misma máquina, arrancar y
 mostrar la versión:
 
-|          | Modo carpeta | Archivo único |
-|----------|--------------|---------------|
-| arranque | 79 ms        | 264 ms        |
+| | Modo carpeta | Archivo único |
+|---|---|---|
+| arranque | 79 ms | 264 ms |
 
 El segundo precio es peor: descomprimirse solo en una carpeta temporal y
 ejecutar código desde allí es, estructuralmente, lo que hace cierto programa
@@ -575,7 +575,7 @@ no están junto al programa sino en una carpeta temporal cuya ruta queda en
 
 **El nombre del ejecutable es independiente del nombre del archivo.** Se
 declara en `name`, dentro de cada bloque `EXE`, y por eso los ejecutables
-salen como `pdf_word_finder` y `pdf_word_finder-gui` aunque las fuentes
+salen como `pdf-word-finder` y `pdf-word-finder-gui` aunque las fuentes
 lleven guiones bajos.
 
 ### Construcción automática y publicación en GitHub
@@ -609,13 +609,13 @@ etiqueta.
 Conviene tener clara la distinción, porque GitHub usa las dos palabras y son
 cosas distintas:
 
-|                | Artefacto                                   | Release                           |
-|----------------|---------------------------------------------|-----------------------------------|
-| Dónde          | pestaña «Actions», dentro de cada ejecución | pestaña «Releases»                |
-| Cuánto dura    | se borra a los 90 días                      | permanente                        |
-| Quién descarga | solo con sesión iniciada en GitHub          | cualquiera                        |
-| Formato        | siempre `.zip` impuesto por GitHub          | los archivos tal como se subieron |
-| Para qué       | probar una construcción                     | distribuir                        |
+| | Artefacto | Release |
+|---|---|---|
+| Dónde | pestaña «Actions», dentro de cada ejecución | pestaña «Releases» |
+| Cuánto dura | se borra a los 90 días | permanente |
+| Quién descarga | solo con sesión iniciada en GitHub | cualquiera |
+| Formato | siempre `.zip` impuesto por GitHub | los archivos tal como se subieron |
+| Para qué | probar una construcción | distribuir |
 
 Para entregarle el programa a un colega, tiene que ser una release. Un
 artefacto es material de trabajo interno.
@@ -657,9 +657,9 @@ Por consola, con la herramienta oficial `gh`:
 
 ```bash
 gh release create v1.2 \
-    pdf_word_finder-linux-x64.tar.gz \
-    pdf_word_finder-windows-x64.zip \
-    --title "pdf_word_finder 1.2" \
+    pdf-word-finder-linux-x64.tar.gz \
+    pdf-word-finder-windows-x64.zip \
+    --title "pdf-word-finder 1.2" \
     --notes "Versión 1.2."
 ```
 
@@ -704,8 +704,8 @@ Con eso basta la primera vez; después abre sin preguntar nada.
 Si prefiere hacerlo desde PowerShell, una orden reemplaza al primer paso:
 
 ```powershell
-Unblock-File .\pdf_word_finder-gui.exe        # un archivo suelto
-Get-ChildItem -Recurse .\pdf_word_finder | Unblock-File   # una carpeta
+Unblock-File .\pdf-word-finder-gui.exe        # un archivo suelto
+Get-ChildItem -Recurse .\pdf-word-finder | Unblock-File   # una carpeta
 ```
 
 Dos situaciones en las que lo anterior no funciona, ambas propias de
@@ -771,12 +771,12 @@ Python es gratuito, se instala desde la Microsoft Store sin permisos de
 administrador, y ningún antivirus objeta un archivo `.py`.
 
 Para que a un colega no le cueste más que un doble clic, el proyecto incluye
-`pdf_word_finder.bat`. Se distribuye un `.zip` con tres archivos:
+`pdf-word-finder.bat`. Se distribuye un `.zip` con tres archivos:
 
 ```
 pdf_word_finder.py
 pdf_word_finder_gui.py
-pdf_word_finder.bat
+pdf-word-finder.bat
 ```
 
 y la instrucción es: descomprimir y hacer doble clic en el `.bat`.
@@ -810,10 +810,13 @@ Tres detalles de ese archivo que conviene no «arreglar»:
 * **Abre la ventana con `pythonw`** y no con `python`, para que no quede
   detrás una ventana negra de consola.
 
-Y un detalle que sí conviene revisar de vez en cuando: el lanzador pide a
-`winget` la versión `Python.Python.3.12`. Ese identificador envejece. Cuando
-3.12 quede muy atrás, basta cambiar ese número en el `.bat`; si no se hace,
-tampoco es grave, porque el programa recurre entonces a la Microsoft Store.
+Sobre la versión de Python que instala: `winget` identifica cada serie por
+separado —`Python.Python.3.14`, `Python.Python.3.15`…— y no existe un
+identificador genérico que signifique «la más reciente». El lanzador las
+prueba de mayor a menor y se queda con la primera que encuentre en el
+catálogo, de modo que instala la más nueva disponible sin necesidad de
+mantenimiento. La lista llega hasta 3.19; si algún día hiciera falta, basta
+añadir números al principio.
 
 ### Alternativas más ligeras
 
@@ -828,7 +831,7 @@ de 20 MB:
   destino, pero se distribuye como una unidad.
 
 * **Un paquete instalable.** Con un `pyproject.toml` mínimo y un punto de
-  entrada de consola, `pipx install` deja la orden `pdf_word_finder`
+  entrada de consola, `pipx install` deja la orden `pdf-word-finder`
   disponible en todo el sistema. Es lo indicado si algún día publica el
   programa en PyPI, y los nombres actuales ya sirven tal cual.
 
@@ -843,7 +846,7 @@ python pdf_word_finder.py --version
 ```
 
 ```
-pdf_word_finder 1.2 — © Nicolás Vaughan 2026 — licencia MIT
+pdf-word-finder 1.2 — © Nicolás Vaughan 2026 — licencia MIT
 ```
 
 En el código está declarada una sola vez, en `__version__`, y de ahí la toma
