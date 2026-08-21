@@ -818,6 +818,39 @@ catálogo, de modo que instala la más nueva disponible sin necesidad de
 mantenimiento. La lista llega hasta 3.19; si algún día hiciera falta, basta
 añadir números al principio.
 
+#### Un acceso en el menú de inicio
+
+El equivalente windows del `.desktop` de Linux es un acceso directo `.lnk`
+guardado en la carpeta del menú de inicio del usuario:
+
+```
+%APPDATA%\Microsoft\Windows\Start Menu\Programs
+```
+
+Se crea con `crear-acceso-directo.bat`, que se ejecuta una sola vez y ofrece
+además dejar un acceso en el escritorio. Después, el programa se abre desde
+el menú de inicio como cualquier otra aplicación.
+
+El acceso **no apunta al `.bat`** sino directamente a `pythonw.exe`, pasándole
+la ruta de la interfaz. Eso resuelve de paso dos cosas: no queda detrás una
+ventana negra de consola, y Windows no somete los accesos directos al filtro
+que aplica a los archivos de órdenes descargados de internet —que es la razón
+de que un `.bat` recién bajado se bloquee al hacerle doble clic en el
+Explorador aunque funcione perfectamente desde la terminal—.
+
+> Si prefiere no ejecutar nada: clic derecho sobre `pdf-word-finder.bat` →
+> «Mostrar más opciones» → «Crear acceso directo», y arrastre el resultado a
+> la carpeta de arriba. El efecto es el mismo, salvo que el acceso apuntará
+> al `.bat` y heredará su bloqueo si lo tuviera.
+
+Sobre ese bloqueo: se quita de una vez con
+
+```powershell
+Unblock-File .\pdf-word-finder.bat
+```
+
+o desmarcándolo en Propiedades, como se explicó más arriba.
+
 ### Alternativas más ligeras
 
 Si el destinatario tiene Python, hay caminos más sencillos que un ejecutable
