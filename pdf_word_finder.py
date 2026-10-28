@@ -3,7 +3,7 @@
 pdf_word_finder.py — busca palabras o frases en un PDF e informa dónde
 aparecen.
 
-© Nicolás Vaughan 2026. Distribuido bajo licencia MIT (véase LICENSE).
+© Nicolás Vaughan 2026. Distribuido bajo la licencia GNU GPL, versión 3 o posterior (véase LICENSE).
 
 Informa la página *rotulada* de cada aparición: el número realmente impreso
 en la página, tomado del árbol /PageLabels del PDF (numeración romana del
@@ -56,7 +56,7 @@ from __future__ import annotations
 __version__ = "1.4"
 __author__ = "Nicolás Vaughan"
 __copyright__ = "© Nicolás Vaughan 2026"
-__license__ = "MIT"
+__license__ = "GPL-3.0-or-later"
 
 import argparse
 import csv

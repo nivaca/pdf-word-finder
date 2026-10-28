@@ -7,7 +7,7 @@ rem  Si falta Python, se ofrece instalarlo; si falta pypdf, se instala solo.
 rem  Tras instalar Python el lanzador sigue adelante sin que haya que
 rem  volver a empezar.
 rem
-rem  (c) Nicolas Vaughan 2026. Licencia MIT.
+rem  (c) Nicolas Vaughan 2026. Licencia GNU GPL v3 o posterior.
 rem ---------------------------------------------------------------------
 rem  NOTA: este archivo se escribe sin tildes a proposito. La consola de
 rem  Windows no usa UTF-8 por omision y los acentos saldrian ilegibles.

@@ -1,6 +1,8 @@
 # pdf-word-finder
 
-**Versión 1.4** · © Nicolás Vaughan 2026 · Licencia MIT
+**Versión 1.4** · © Nicolás Vaughan 2026 · Licencia GNU GPL v3 o posterior
+
+*English version: [README_en.md](README_en.md).*
 
 Busca una lista de palabras, frases o expresiones regulares dentro de un
 archivo PDF e informa **en qué páginas aparece cada una**, distinguiendo
@@ -108,7 +110,7 @@ Así se escribe `pdf-word-finder libro.pdf amor` sin más.
 
 > **Nota sobre los nombres.** Los archivos fuente llevan guiones bajos
 > —`pdf_word_finder.py`— porque el guion no es un carácter válido en un
-> identificador de Python y un archivo llamado `pdf_word_finder.py` no podría
+> identificador de Python y un archivo llamado `pdf-word-finder.py` no podría
 > importarse con `import`. Los ejecutables y las órdenes de consola, en
 > cambio, llevan guiones: `pdf-word-finder`. No es una inconsecuencia sino la
 > convención corriente en Python, y trae una ventaja práctica: al ser el
@@ -879,7 +881,7 @@ python pdf_word_finder.py --version
 ```
 
 ```
-pdf-word-finder 1.4 — © Nicolás Vaughan 2026 — licencia MIT
+pdf-word-finder 1.4 — © Nicolás Vaughan 2026 — licencia GPL-3.0-or-later
 ```
 
 ### Cambiar el número de versión
@@ -887,8 +889,9 @@ pdf-word-finder 1.4 — © Nicolás Vaughan 2026 — licencia MIT
 El número vive en un solo lugar: `__version__`, en `pdf_word_finder.py`. La
 interfaz gráfica muestra `núcleo.__version__`, y la receta de PyInstaller lo
 lee del archivo al construir, de modo que ninguno de los dos puede quedarse
-atrás. El README es la excepción —menciona la cifra en varios sitios y no
-puede deducirla—, y para eso está `subir_version.py`:
+atrás. Los README —`README.md` y su traducción, `README_en.md`— son la
+excepción: mencionan la cifra en varios sitios y no pueden deducirla, y para
+eso está `subir_version.py`:
 
 ```bash
 python subir_version.py 1.3        # cambia la versión en todas partes
@@ -897,9 +900,9 @@ python subir_version.py --revisar  # comprueba que todo concuerde
 ```
 
 El modo `--revisar` sirve como red de seguridad antes de etiquetar: devuelve
-un código de error si el README menciona una versión distinta de la del
-programa, de modo que puede llamarse desde un gancho de git o desde el flujo
-de trabajo.
+un código de error si alguno de los README menciona una versión distinta
+de la del programa, de modo que puede llamarse desde un gancho de git o
+desde el flujo de trabajo.
 
 Los patrones del guion están anclados a su contexto —`**Versión X**`,
 `git tag -a X`, `pdf-word-finder X — ©`…— y no sustituyen cifras sueltas. Es
@@ -917,18 +920,20 @@ cambiarla en ese único lugar.
 
 © Nicolás Vaughan 2026.
 
-Distribuido bajo **licencia MIT**; el texto completo está en el archivo
-`LICENSE` que acompaña a este README. En resumen: cualquiera puede usar,
-copiar, modificar, fusionar, publicar, distribuir, sublicenciar y vender
-copias del programa, con la única condición de conservar el aviso de
-copyright y el de la licencia en las copias o partes sustanciales que
-distribuya. El programa se entrega «tal cual», sin garantía de ninguna
-clase.
+Distribuido bajo la **Licencia Pública General de GNU (GPL), versión 3 o,
+a su elección, cualquier versión posterior**; el texto completo está en el
+archivo `LICENSE` que acompaña a este README. En resumen: cualquiera puede
+usar, estudiar, copiar, modificar y distribuir el programa, incluso a cambio
+de dinero, con la condición de que lo que distribuya —el programa tal cual o
+una versión modificada— vaya bajo la misma licencia, conserve los avisos de
+copyright y de licencia, y se entregue acompañado de su código fuente (o de
+una oferta para obtenerlo). El programa se entrega «tal cual», sin garantía
+de ninguna clase.
 
-Al distribuirlo conviene incluir los cuatro archivos
-—`pdf_word_finder.py`, `pdf_word_finder_gui.py`, `README.md` y `LICENSE`—,
+Al distribuirlo conviene incluir los archivos `pdf_word_finder.py`,
+`pdf_word_finder_gui.py`, `README.md`, `README_en.md` y `LICENSE`,
 más `pdf_word_finder.spec` si quiere que otros puedan construir los
 ejecutables,
 porque el aviso de copyright que llevan incorporado los dos programas remite
-al último, y la interfaz gráfica no funciona sin el programa de línea de
+a `LICENSE`, y la interfaz gráfica no funciona sin el programa de línea de
 órdenes en la misma carpeta.

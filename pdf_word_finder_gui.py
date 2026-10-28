@@ -2,7 +2,7 @@
 """
 pdf_word_finder_gui.py — interfaz gráfica sencilla para pdf_word_finder.py.
 
-© Nicolás Vaughan 2026. Distribuido bajo licencia MIT (véase LICENSE).
+© Nicolás Vaughan 2026. Distribuido bajo la licencia GNU GPL, versión 3 o posterior (véase LICENSE).
 
 No duplica nada del programa de línea de órdenes: importa
 «pdf_word_finder.py» y reutiliza sus funciones (extracción del texto,
@@ -452,8 +452,10 @@ class Aplicación(ttk.Frame):
                  "numeración impresa de la secuencial del archivo.\n\n"
                  f"{núcleo.__copyright__}\n"
                  f"Licencia {núcleo.__license__}: puede usarse, modificarse y "
-                 "distribuirse libremente conservando el aviso de autoría. "
-                 "Se entrega sin garantía de ninguna clase.").grid(sticky="w")
+                 "distribuirse libremente, siempre que las versiones que se "
+                 "distribuyan conserven esta misma licencia y vayan "
+                 "acompañadas de su código fuente. Se entrega sin garantía "
+                 "de ninguna clase.").grid(sticky="w")
 
         ttk.Separator(marco, orient="horizontal").grid(
             sticky="ew", pady=12)

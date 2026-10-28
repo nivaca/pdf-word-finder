@@ -11,7 +11,7 @@ rem  es lo que conviene por dos razones: no queda una ventana negra de
 rem  consola detras, y Windows no somete los accesos directos al filtro
 rem  que aplica a los archivos de ordenes bajados de internet.
 rem
-rem  (c) Nicolas Vaughan 2026. Licencia MIT.
+rem  (c) Nicolas Vaughan 2026. Licencia GNU GPL v3 o posterior.
 rem ---------------------------------------------------------------------
 rem  NOTA: sin tildes a proposito (la consola de Windows no usa UTF-8) y
 rem  con finales de renglon CRLF.
