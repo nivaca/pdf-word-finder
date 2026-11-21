@@ -1,12 +1,18 @@
 # Changelog
 
 All notable changes to pdf-word-finder. The releases are on
-[GitHub](https://github.com/nivaca/pdf-word-finder/releases) (1.1 and 1.4
-have release pages; 1.2 to 1.23 are only tags). The program and its
+[GitHub](https://github.com/nivaca/pdf-word-finder/releases) (1.1, 1.4 and
+1.5 have release pages; 1.2 to 1.23 are only tags). The program and its
 README are in Spanish; an English README is in `README_en.md`.
 
-## Unreleased
+## 1.5 — 2026-11-21
 
+- A list of the open-source software used in the program, with versions
+  and licenses: `docs/THIRD_PARTY_LICENSES.md` and, in Spanish,
+  `docs/LICENCIAS_DE_TERCEROS_es.md`. The README points to it, and the
+  package carries it, with `LICENSE` and the READMEs.
+- The Linux package is built with Python 3.15. There is no Windows package
+  for this version.
 - **The license is now the GNU GPL, version 3 or later** (it was MIT):
   `LICENSE`, the README, the headers of the scripts and `__license__`.
 - An English translation of the README, `README_en.md`.

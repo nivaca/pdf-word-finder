@@ -53,7 +53,7 @@ Opcional:  pip install pymupdf   (mejor extracción de texto; se usa si está)
 
 from __future__ import annotations
 
-__version__ = "1.4"
+__version__ = "1.5"
 __author__ = "Nicolás Vaughan"
 __copyright__ = "© Nicolás Vaughan 2026"
 __license__ = "GPL-3.0-or-later"

@@ -1,6 +1,6 @@
 # pdf-word-finder
 
-**Versión 1.4** · © Nicolás Vaughan 2026 · Licencia GNU GPL v3 o posterior
+**Versión 1.5** · © Nicolás Vaughan 2026 · Licencia GNU GPL v3 o posterior
 
 *English version: [README_en.md](README_en.md).*
 
@@ -588,8 +588,8 @@ GitHub, sin necesidad de tener a mano un Windows y un Mac, y las adjunta a
 una *release*. Todo el procedimiento se reduce a etiquetar:
 
 ```bash
-git tag -a v1.4 -m "Versión 1.4"
-git push origin v1.4
+git tag -a v1.5 -m "Versión 1.5"
+git push origin v1.5
 ```
 
 Unos minutos después, en la pestaña «Releases» del repositorio aparece un
@@ -658,11 +658,11 @@ adjuntos → «Publish release».
 Por consola, con la herramienta oficial `gh`:
 
 ```bash
-gh release create v1.4 \
+gh release create v1.5 \
     pdf-word-finder-linux-x64.tar.gz \
     pdf-word-finder-windows-x64.zip \
-    --title "pdf-word-finder 1.4" \
-    --notes "Versión 1.4."
+    --title "pdf-word-finder 1.5" \
+    --notes "Versión 1.5."
 ```
 
 En ambos casos recuerde que los paquetes deben construirse en cada sistema
@@ -874,14 +874,14 @@ de 20 MB:
 
 ## 12. Versión
 
-Versión **1.4**. La cifra se consulta desde el propio programa:
+Versión **1.5**. La cifra se consulta desde el propio programa:
 
 ```bash
 python pdf_word_finder.py --version
 ```
 
 ```
-pdf-word-finder 1.4 — © Nicolás Vaughan 2026 — licencia GPL-3.0-or-later
+pdf-word-finder 1.5 — © Nicolás Vaughan 2026 — licencia GPL-3.0-or-later
 ```
 
 ### Cambiar el número de versión
@@ -937,3 +937,10 @@ ejecutables,
 porque el aviso de copyright que llevan incorporado los dos programas remite
 a `LICENSE`, y la interfaz gráfica no funciona sin el programa de línea de
 órdenes en la misma carpeta.
+
+El software libre sobre el que está hecho el programa —Python, pypdf,
+Tcl/Tk, PyInstaller y las bibliotecas que van dentro de los paquetes— está
+enumerado, con su versión y su licencia, en
+[`docs/LICENCIAS_DE_TERCEROS_es.md`](docs/LICENCIAS_DE_TERCEROS_es.md)
+(en inglés, [`docs/THIRD_PARTY_LICENSES.md`](docs/THIRD_PARTY_LICENSES.md)).
+Todas esas licencias son compatibles con la GPL.

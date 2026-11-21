@@ -1,6 +1,6 @@
 # pdf-word-finder
 
-**Version 1.4** · © Nicolás Vaughan 2026 · License GNU GPL v3 or later
+**Version 1.5** · © Nicolás Vaughan 2026 · License GNU GPL v3 or later
 
 *Versión en español: [README.md](README.md).*
 
@@ -607,8 +607,8 @@ don't need to have a Windows and a Mac at hand, and it attaches them to a
 *release*. All the procedure is reduced to making a tag:
 
 ```bash
-git tag -a v1.4 -m "Versión 1.4"
-git push origin v1.4
+git tag -a v1.5 -m "Versión 1.5"
+git push origin v1.5
 ```
 
 Some minutes later, in the "Releases" tab of the repository, you will see a
@@ -679,11 +679,11 @@ area → "Publish release".
 On the console, with the official tool `gh`:
 
 ```bash
-gh release create v1.4 \
+gh release create v1.5 \
     pdf-word-finder-linux-x64.tar.gz \
     pdf-word-finder-windows-x64.zip \
-    --title "pdf-word-finder 1.4" \
-    --notes "Versión 1.4."
+    --title "pdf-word-finder 1.5" \
+    --notes "Versión 1.5."
 ```
 
 In both cases remember that the packages must be built on each operating
@@ -896,14 +896,14 @@ If the person has Python, there are simpler ways than a 20 MB executable:
 
 ## 12. Version
 
-Version **1.4**. You can check the number from the program itself:
+Version **1.5**. You can check the number from the program itself:
 
 ```bash
 python pdf_word_finder.py --version
 ```
 
 ```
-pdf-word-finder 1.4 — © Nicolás Vaughan 2026 — licencia GPL-3.0-or-later
+pdf-word-finder 1.5 — © Nicolás Vaughan 2026 — licencia GPL-3.0-or-later
 ```
 
 ### Changing the version number
@@ -957,3 +957,10 @@ also `pdf_word_finder.spec` if you want that others can build the
 executables. The reason is that the copyright notice inside the two programs
 points to `LICENSE`, and the graphical interface does not work without the
 command line program in the same folder.
+
+The open-source software the program is made with (Python, pypdf, Tcl/Tk,
+PyInstaller and the libraries that go inside the packages) is listed, with
+its version and its license, in
+[`docs/THIRD_PARTY_LICENSES.md`](docs/THIRD_PARTY_LICENSES.md) (in Spanish,
+[`docs/LICENCIAS_DE_TERCEROS_es.md`](docs/LICENCIAS_DE_TERCEROS_es.md)).
+All these licenses are compatible with the GPL.
