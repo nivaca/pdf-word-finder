@@ -8,7 +8,7 @@ enumera aquí. Todas las licencias de la lista son compatibles con la
 GPL-3.0-or-later, de modo que el programa y los paquetes hechos a partir de
 él pueden distribuirse bajo la GPL.
 
-Las versiones son las de la versión 1.5, construida en Linux (Fedora) con
+Las versiones son las de la versión 1.6, construida en Linux (Fedora) con
 Python 3.15. Las licencias van con su identificador SPDX.
 
 Contacto: nicolasvaughan@proton.me
@@ -30,11 +30,11 @@ Opcional, solo si está instalado:
 | [PyMuPDF](https://github.com/pymupdf/PyMuPDF) (con MuPDF) | AGPL-3.0-or-later (o una licencia comercial de Artifex) | extrae el texto mejor que pypdf. Nunca va en los paquetes; el programa lo carga solo si quien lo usa lo instaló. |
 
 
-2. Lo que se usa para construir los paquetes
+2. Lo que se usa para construirlo y probarlo
 --------------------------------------------
 
-Estos programas hacen los ejecutables, pero de ellos solo entra una parte
-pequeña (el cargador de PyInstaller).
+Estos programas hacen los ejecutables y ejecutan las pruebas, pero de ellos
+solo entra en los paquetes una parte pequeña (el cargador de PyInstaller).
 
 | Software | Versión | Licencia |
 |---|---|---|
@@ -44,12 +44,15 @@ pequeña (el cargador de PyInstaller).
 | [packaging](https://github.com/pypa/packaging) | 26.3 | Apache-2.0 OR BSD-2-Clause |
 | [setuptools](https://github.com/pypa/setuptools) | 84.2.1 | MIT |
 | [uv](https://github.com/astral-sh/uv) (para crear el entorno de construcción) | 0.13.7 | Apache-2.0 OR MIT |
+| [pytest](https://pytest.org/) (para ejecutar las pruebas) | 9.2.0 | MIT |
+| [pluggy](https://github.com/pytest-dev/pluggy) e [iniconfig](https://github.com/pytest-dev/iniconfig) | 1.7.0, 2.3.1 | MIT |
+| [Pygments](https://pygments.org/) (lo necesita pytest) | 2.21.0 | BSD-2-Clause |
 
 
 3. Lo que va dentro de los paquetes
 -----------------------------------
 
-Un paquete (`pdf-word-finder-linux-1.5.zip`) lleva su propio intérprete de
+Un paquete (`pdf-word-finder-linux-1.6.zip`) lleva su propio intérprete de
 Python y las bibliotecas que necesita, en la carpeta `_internal/`. Además de
 Python, pypdf y Tcl/Tk (sección 1), contiene:
 

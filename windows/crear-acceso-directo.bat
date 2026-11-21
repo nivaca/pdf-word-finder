@@ -18,17 +18,21 @@ rem  con finales de renglon CRLF.
 rem ---------------------------------------------------------------------
 
 setlocal
-cd /d "%~dp0"
 
-if not exist "pdf_word_finder_gui.py" goto :sin_programa
+rem  El programa esta en la carpeta "src", al lado de esta ("windows").
+rem  El acceso arranca en ella, porque "python -m" busca alli el paquete.
+cd /d "%~dp0..\src" 2>nul || goto :sin_programa
+if not exist "pdf_word_finder\gui.py" goto :sin_programa
 
 rem --- localizar Python -------------------------------------------------
 rem  Se comprueba ejecutandolo: Windows 11 trae un "python" de mentira en
-rem  WindowsApps que solo sirve para abrir la Store.
+rem  WindowsApps que solo sirve para abrir la Store. La prueba descarta
+rem  tambien las versiones anteriores a la 3.14.
+set "PRUEBA=import sys; sys.exit(sys.version_info < (3, 14))"
 set "PYW="
-py -3 -c "import sys" >nul 2>&1 && set "PYW=pyw"
+py -3 -c "%PRUEBA%" >nul 2>&1 && set "PYW=pyw -3"
 if not defined PYW (
-    python -c "import sys" >nul 2>&1 && set "PYW=pythonw"
+    python -c "%PRUEBA%" >nul 2>&1 && set "PYW=pythonw"
 )
 if not defined PYW goto :sin_python
 
@@ -84,7 +88,7 @@ set "PS1=%TEMP%\pwf_acceso.ps1"
 >>"%PS1%" echo $enlace = Join-Path $carpeta 'pdf-word-finder.lnk'
 >>"%PS1%" echo $c = (New-Object -ComObject WScript.Shell).CreateShortcut($enlace)
 >>"%PS1%" echo $c.TargetPath = '%RUTAPYW%'
->>"%PS1%" echo $c.Arguments = '"%CD%\pdf_word_finder_gui.py"'
+>>"%PS1%" echo $c.Arguments = '-m pdf_word_finder.gui'
 >>"%PS1%" echo $c.WorkingDirectory = '%CD%'
 >>"%PS1%" echo $c.IconLocation = '%RUTAPYW%,0'
 >>"%PS1%" echo $c.Description = 'Busca palabras en un PDF e informa la pagina impresa'
@@ -101,7 +105,7 @@ rem  Errores
 rem =====================================================================
 :sin_python
 echo.
-echo   No se encontro Python en este equipo.
+echo   No se encontro Python 3.14 o posterior en este equipo.
 echo.
 echo   Ejecute primero pdf-word-finder.bat, que se ofrece a instalarlo,
 echo   y vuelva luego a este archivo.
@@ -111,10 +115,10 @@ exit /b 1
 
 :sin_programa
 echo.
-echo   Este archivo debe estar en la misma carpeta que:
+echo   Este archivo debe estar en la carpeta "windows" del programa,
+echo   y al lado, en la carpeta "src", el programa mismo:
 echo.
-echo     pdf_word_finder.py
-echo     pdf_word_finder_gui.py
+echo     src\pdf_word_finder\gui.py
 echo.
 pause
 exit /b 1

@@ -7,7 +7,7 @@ text is in `LICENSE`. It is built on the open-source software listed
 here. Every license below is compatible with the GPL-3.0-or-later, so the
 program and the packages made from it can be distributed under the GPL.
 
-The versions are those of version 1.5, built on Linux (Fedora) with
+The versions are those of version 1.6, built on Linux (Fedora) with
 Python 3.15. Licenses are given as SPDX identifiers.
 
 Contact: nicolasvaughan@proton.me
@@ -29,11 +29,11 @@ Optional, only if it is installed:
 | [PyMuPDF](https://github.com/pymupdf/PyMuPDF) (with MuPDF) | AGPL-3.0-or-later (or a commercial license from Artifex) | extracts the text better than pypdf. It is never included in the packages; the program loads it only if the user installed it. |
 
 
-2. What is used to build the packages
--------------------------------------
+2. What is used to build and test it
+------------------------------------
 
-These programs make the executables, but only a small part of them (the
-PyInstaller bootloader) goes inside.
+These programs make the executables and run the tests, but only a small
+part of them (the PyInstaller bootloader) goes inside the packages.
 
 | Software | Version | License |
 |---|---|---|
@@ -43,12 +43,15 @@ PyInstaller bootloader) goes inside.
 | [packaging](https://github.com/pypa/packaging) | 26.3 | Apache-2.0 OR BSD-2-Clause |
 | [setuptools](https://github.com/pypa/setuptools) | 84.2.1 | MIT |
 | [uv](https://github.com/astral-sh/uv) (to make the build environment) | 0.13.7 | Apache-2.0 OR MIT |
+| [pytest](https://pytest.org/) (to run the tests) | 9.2.0 | MIT |
+| [pluggy](https://github.com/pytest-dev/pluggy) and [iniconfig](https://github.com/pytest-dev/iniconfig) | 1.7.0, 2.3.1 | MIT |
+| [Pygments](https://pygments.org/) (needed by pytest) | 2.21.0 | BSD-2-Clause |
 
 
 3. What goes inside the packages
 --------------------------------
 
-A package (`pdf-word-finder-linux-1.5.zip`) carries its own Python
+A package (`pdf-word-finder-linux-1.6.zip`) carries its own Python
 interpreter and the libraries it needs, in the folder `_internal/`. Besides
 Python, pypdf and Tcl/Tk (section 1), it contains:
 

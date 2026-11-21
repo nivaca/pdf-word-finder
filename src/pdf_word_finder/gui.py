@@ -1,21 +1,21 @@
-#!/usr/bin/env python3
 """
-pdf_word_finder_gui.py — interfaz gráfica sencilla para pdf_word_finder.py.
+La interfaz gráfica de pdf-word-finder (tkinter).
 
-© Nicolás Vaughan 2026. Distribuido bajo la licencia GNU GPL, versión 3 o posterior (véase LICENSE).
+© Nicolás Vaughan 2026. Distribuido bajo la licencia GNU GPL, versión 3 o
+posterior (véase LICENSE).
 
-No duplica nada del programa de línea de órdenes: importa
-«pdf_word_finder.py» y reutiliza sus funciones (extracción del texto,
-normalización, construcción de patrones, formato de las páginas). Cualquier
+No duplica nada del programa de línea de órdenes: la búsqueda, el informe y
+la exportación son las mismas funciones del paquete, de modo que cualquier
 corrección hecha allí se refleja aquí sin tocar este archivo.
 
+Se abre con la orden `pdf-word-finder-gui` o, sin instalar el paquete, con
+`python -m pdf_word_finder.gui` desde la carpeta src/.
+
 Solo requiere tkinter, que viene con Python. En Linux, si falta:
-    sudo apt install python3-tk
+    sudo apt install python3-tk      (Debian, Ubuntu)
+    sudo dnf install python3-tkinter (Fedora)
 """
 
-from __future__ import annotations
-
-import csv
 import os
 import platform
 import queue
@@ -24,117 +24,57 @@ import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-# --------------------------------------------------------------------------
-# Carga del programa de línea de órdenes
-# --------------------------------------------------------------------------
-# Ambos archivos viven en la misma carpeta, de modo que basta importarlo. Es
-# importante que sea una importación corriente y no una carga por ruta: así
-# PyInstaller la ve al analizar el código y empaqueta el núcleo —y con él
-# pypdf— sin necesidad de declararlos a mano (véase el README, §11).
-
-try:
-    import pdf_word_finder as núcleo
-except ImportError as exc:  # sin el núcleo no hay nada que hacer
-    _raíz = tk.Tk()
-    _raíz.withdraw()
-    messagebox.showerror(
-        "pdf-word-finder",
-        f"No se encontró «pdf_word_finder.py».\n\n"
-        f"Debe estar en la misma carpeta que esta interfaz.\n\n{exc}")
-    sys.exit(1)
-
+from . import __copyright__, __license__, __version__
+from .extraction import Document, PdfError, extract_pages, load_pymupdf
+from .patterns import PatternError
+from .report import build_report, write_csv, write_txt
+from .search import Options, Result, read_terms, search
+from .text import plural
 
 # --------------------------------------------------------------------------
 # Búsqueda (se ejecuta en un hilo aparte)
 # --------------------------------------------------------------------------
 
 
-class ErrorDeBúsqueda(Exception):
+class SearchError(Exception):
     pass
 
 
-_caché: dict[tuple, tuple] = {}
+_cache: dict[tuple[str, float], Document] = {}
 
 
-def extraer_con_caché(ruta: str):
+def extract_cached(path: str) -> Document:
     """Evita releer el PDF cuando solo cambian las opciones de búsqueda."""
-    clave = (ruta, os.path.getmtime(ruta))
-    if clave not in _caché:
-        _caché.clear()  # un PDF a la vez basta
-        _caché[clave] = núcleo.extract_pages(ruta)
-    return _caché[clave]
+    key = (path, os.path.getmtime(path))
+    if key not in _cache:
+        _cache.clear()  # un PDF a la vez basta
+        _cache[key] = extract_pages(path)
+    return _cache[key]
 
 
-def buscar(ruta: str, términos: list[str], op: dict) -> dict:
-    """Ejecuta la búsqueda y devuelve todo lo necesario para el informe.
-
-    Las funciones del núcleo terminan el programa con sys.exit() cuando algo
-    falla, lo cual es correcto en la línea de órdenes pero cerraría la
-    ventana sin explicación. Aquí se captura SystemExit y se convierte en un
-    error normal, que la interfaz muestra en un cuadro de diálogo.
-    """
+def run_search(path: str, terms: list[str], opts: Options) -> Result:
+    """La búsqueda, con los errores convertidos en SearchError, que la
+    interfaz muestra en un cuadro de diálogo."""
     try:
-        textos, rótulos, hay_rótulos = extraer_con_caché(ruta)
-    except SystemExit as exc:
-        raise ErrorDeBúsqueda(str(exc) or "No se pudo abrir el PDF.") from None
+        doc = extract_cached(path)
+    except PdfError as exc:
+        raise SearchError(str(exc)) from None
     except Exception as exc:
-        raise ErrorDeBúsqueda(f"No se pudo abrir el PDF: {exc}") from None
-
-    páginas = [núcleo.normalise(t, not op["no_dehyphenate"],
-                                op["ignore_accents"]) for t in textos]
-
-    patrones = {}
-    for t in términos:
-        try:
-            patrones[t] = núcleo.build_pattern(
-                t, as_regex=op["regex"], substring=op["substring"],
-                case_sensitive=op["case_sensitive"],
-                ignore_accents=op["ignore_accents"],
-                regex_word=op["regex_word"])
-        except SystemExit as exc:
-            raise ErrorDeBúsqueda(str(exc)) from None
-
-    resultados: dict[str, list] = {t: [] for t in términos}
-    for i, página in enumerate(páginas):
-        for término, patrón in patrones.items():
-            apariciones = list(patrón.finditer(página))
-            if not apariciones:
-                continue
-            fragmentos = []
-            if op["context"]:
-                w = op["context_width"]
-                for m in apariciones:
-                    a = max(0, m.start() - w)
-                    b = min(len(página), m.end() + w)
-                    fragmentos.append(("…" if a else "") + página[a:b].strip()
-                                      + ("…" if b < len(página) else ""))
-            resultados[término].append(
-                (i + 1, rótulos[i], len(apariciones), fragmentos))
-
-    vacías = sum(1 for p in páginas if not p.strip())
-    return {"resultados": resultados, "términos": términos,
-            "hay_rótulos": hay_rótulos, "vacías": vacías,
-            "total_páginas": len(páginas), "show_logical": op["show_logical"],
-            "detailed": op["detailed"] or op["context"],
-            "alphabetical": op["alphabetical"]}
+        raise SearchError(f"No se pudo abrir el PDF: {exc}") from None
+    try:
+        return search(doc, terms, opts)
+    except PatternError as exc:
+        raise SearchError(str(exc)) from None
 
 
-def componer_informe(datos: dict) -> str:
-    """Arma el mismo texto que imprime el programa de línea de órdenes.
-
-    El formato lo compone el núcleo (build_report), no esta interfaz: así no
-    hay dos versiones del informe que puedan divergir. Lo único que cambia
-    es que aquí las notas se muestran junto al informe, mientras que en la
-    consola van al canal de error para no ensuciar la salida.
-    """
-    informe, notas = núcleo.build_report(
-        datos["términos"], datos["resultados"],
-        has_labels=datos["hay_rótulos"], empty=datos["vacías"],
-        total_pages=datos["total_páginas"],
-        show_logical=datos["show_logical"],
-        detailed=datos["detailed"],
-        alphabetical=datos["alphabetical"])
-    return "\n\n".join(p for p in (notas, informe) if p)
+def compose_report(result: Result, show_logical: bool, detailed: bool,
+                   alphabetical: bool) -> str:
+    """El mismo texto que imprime el programa de línea de órdenes. Lo único
+    que cambia es que aquí las notas se muestran encima del informe,
+    mientras que en la consola van al canal de error."""
+    report, notes = build_report(result, show_logical=show_logical,
+                                 detailed=detailed, alphabetical=alphabetical)
+    return "\n\n".join(p for p in (notes, report) if p)
 
 
 # --------------------------------------------------------------------------
@@ -153,7 +93,8 @@ class Aplicación(ttk.Frame):
         self.rowconfigure(4, weight=1)
 
         self.cola: queue.Queue = queue.Queue()
-        self.últimos: dict | None = None
+        self.últimos: Result | None = None
+        self.show_logical = False
         self.buscando = False
 
         self._construir()
@@ -273,7 +214,7 @@ class Aplicación(ttk.Frame):
 
         # --- barra de estado ---
         self.var_estado = tk.StringVar(
-            value=f"pdf-word-finder {núcleo.__version__} — listo")
+            value=f"pdf-word-finder {__version__} — listo")
         ttk.Label(self, textvariable=self.var_estado,
                   relief="sunken", anchor="w").grid(row=5, column=0,
                                                     sticky="ew")
@@ -303,12 +244,7 @@ class Aplicación(ttk.Frame):
         self.txt_términos.insert("end", ("\n" if actual else "") + contenido)
 
     def _términos(self) -> list[str]:
-        términos = []
-        for renglón in self.txt_términos.get("1.0", "end").splitlines():
-            renglón = renglón.split("#", 1)[0].strip()
-            if renglón:
-                términos.append(renglón)
-        return términos
+        return read_terms(self.txt_términos.get("1.0", "end").splitlines())
 
     def _buscar(self) -> None:
         if self.buscando:
@@ -325,7 +261,19 @@ class Aplicación(ttk.Frame):
             return
 
         op = {c: v.get() for c, v in self.op.items()}
-        op["context_width"] = self.var_ancho.get()
+        try:
+            ancho = int(self.var_ancho.get())
+        except (tk.TclError, ValueError):
+            ancho = 60
+        opciones = Options(
+            regex=op["regex"], regex_word=op["regex_word"],
+            substring=op["substring"], case_sensitive=op["case_sensitive"],
+            ignore_accents=op["ignore_accents"],
+            dehyphenate=not op["no_dehyphenate"],
+            context_width=ancho if op["context"] else None)
+        informe = {"show_logical": op["show_logical"],
+                   "detailed": op["detailed"] or op["context"],
+                   "alphabetical": op["alphabetical"]}
 
         self.buscando = True
         self.btn_buscar.configure(state="disabled")
@@ -339,8 +287,9 @@ class Aplicación(ttk.Frame):
         # se recoge desde el hilo principal.
         def tarea():
             try:
-                self.cola.put(("ok", buscar(ruta, términos, op)))
-            except ErrorDeBúsqueda as exc:
+                resultado = run_search(ruta, términos, opciones)
+                self.cola.put(("ok", (resultado, informe)))
+            except SearchError as exc:
                 self.cola.put(("error", str(exc)))
             except Exception as exc:  # red de seguridad
                 self.cola.put(("error", f"Error inesperado: {exc}"))
@@ -359,18 +308,17 @@ class Aplicación(ttk.Frame):
                 self.var_estado.set("Error")
                 messagebox.showerror("Error", carga)
             else:
-                self.últimos = carga
-                self._mostrar(componer_informe(carga))
-                total = sum(f[2] for filas in carga["resultados"].values()
-                            for f in filas)
-                páginas = len({f[0] for filas in carga["resultados"].values()
-                               for f in filas})
+                resultado, informe = carga
+                self.últimos = resultado
+                self.show_logical = informe["show_logical"]
+                self._mostrar(compose_report(resultado, **informe))
+                total = resultado.total()
+                páginas = resultado.pages_with_hits()
                 self.var_estado.set(
                     f"{total} "
-                    f"{núcleo.plural(total, 'aparición', 'apariciones')} en "
-                    f"{páginas} "
-                    f"{núcleo.plural(páginas, 'página', 'páginas')} "
-                    f"de {carga['total_páginas']}")
+                    f"{plural(total, 'aparición', 'apariciones')} en "
+                    f"{páginas} {plural(páginas, 'página', 'páginas')} "
+                    f"de {resultado.total_pages}")
                 estado = "normal" if total else "disabled"
                 self.btn_csv.configure(state=estado)
                 self.btn_txt.configure(state=estado)
@@ -400,9 +348,9 @@ class Aplicación(ttk.Frame):
             líneas.append(f"pypdf {pypdf.__version__}")
         except Exception:
             líneas.append("pypdf: no encontrado")
-        # Se pregunta al núcleo, para que la ventana no pueda discrepar de
+        # Se pregunta a la extracción, para que la ventana no pueda discrepar de
         # lo que el programa hace de veras al extraer el texto.
-        mupdf = núcleo.cargar_pymupdf()
+        mupdf = load_pymupdf()
         if mupdf is None:
             líneas.append("PyMuPDF: no instalado (se extrae con pypdf)")
         else:
@@ -442,7 +390,7 @@ class Aplicación(ttk.Frame):
 
         ttk.Label(marco, text="pdf-word-finder",
                   font=("TkDefaultFont", 14, "bold")).grid(sticky="w")
-        ttk.Label(marco, text=f"Versión {núcleo.__version__}").grid(
+        ttk.Label(marco, text=f"Versión {__version__}").grid(
             sticky="w", pady=(2, 10))
 
         ttk.Label(
@@ -450,8 +398,8 @@ class Aplicación(ttk.Frame):
             text="Busca palabras, frases o expresiones regulares en un PDF e "
                  "informa en qué páginas aparecen, distinguiendo la "
                  "numeración impresa de la secuencial del archivo.\n\n"
-                 f"{núcleo.__copyright__}\n"
-                 f"Licencia {núcleo.__license__}: puede usarse, modificarse y "
+                 f"{__copyright__}\n"
+                 f"Licencia {__license__}: puede usarse, modificarse y "
                  "distribuirse libremente, siempre que las versiones que se "
                  "distribuyan conserven esta misma licencia y vayan "
                  "acompañadas de su código fuente. Se entrega sin garantía "
@@ -498,14 +446,12 @@ class Aplicación(ttk.Frame):
         if not ruta:
             return
         try:
-            n = núcleo.write_txt(ruta, self.últimos["términos"],
-                                 self.últimos["resultados"],
-                                 self.últimos["show_logical"])
+            n = write_txt(ruta, self.últimos, self.show_logical)
         except OSError as exc:
             messagebox.showerror("Error", f"No se pudo escribir:\n{exc}")
             return
         self.var_estado.set(
-            f"Lista de {n} {núcleo.plural(n, 'entrada', 'entradas')} "
+            f"Lista de {n} {plural(n, 'entrada', 'entradas')} "
             f"escrita en {ruta}")
 
     def _guardar_csv(self) -> None:
@@ -517,18 +463,7 @@ class Aplicación(ttk.Frame):
         if not ruta:
             return
         try:
-            with open(ruta, "w", newline="", encoding="utf-8") as fh:
-                w = csv.writer(fh)
-                w.writerow(["termino", "pagina_secuencial", "pagina_rotulada",
-                            "apariciones", "contexto"])
-                orden = sorted(self.últimos["términos"],
-                               key=lambda t: núcleo.sort_key(
-                                   núcleo.display_term(t)))
-                for término in orden:
-                    for lg, lb, c, frags in self.últimos["resultados"].get(
-                            término, []):
-                        w.writerow([núcleo.display_term(término), lg, lb, c,
-                                    " | ".join(frags)])
+            write_csv(ruta, self.últimos)
         except OSError as exc:
             messagebox.showerror("Error", f"No se pudo escribir:\n{exc}")
             return
@@ -540,12 +475,12 @@ class Aplicación(ttk.Frame):
         self.últimos = None
         self.btn_csv.configure(state="disabled")
         self.btn_txt.configure(state="disabled")
-        self.var_estado.set(f"pdf-word-finder {núcleo.__version__} — listo")
+        self.var_estado.set(f"pdf-word-finder {__version__} — listo")
 
 
 def main() -> None:
     raíz = tk.Tk()
-    raíz.title(f"pdf-word-finder {núcleo.__version__}")
+    raíz.title(f"pdf-word-finder {__version__}")
     raíz.minsize(640, 700)
     try:  # tema más agradable donde esté disponible
         ttk.Style().theme_use("clam")

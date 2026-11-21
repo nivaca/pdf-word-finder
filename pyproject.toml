@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-word-finder"
+dynamic = ["version"]
+description = "Busca palabras en un PDF e informa las páginas impresas (rotuladas) en que aparecen"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [{ name = "Nicolás Vaughan", email = "nicolasvaughan@proton.me" }]
+keywords = ["pdf", "index", "page labels", "search", "concordance"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Environment :: X11 Applications :: Tk",
+    "Natural Language :: Spanish",
+    "Topic :: Text Processing :: Indexing",
+]
+dependencies = ["pypdf[crypto]>=5"]   # crypto: los PDF cifrados con AES
+
+[project.optional-dependencies]
+mupdf = ["pymupdf"]       # mejor extracción del texto (licencia AGPL)
+dev = ["pytest", "pyinstaller"]
+
+[project.scripts]
+pdf-word-finder = "pdf_word_finder.cli:main"
+
+[project.gui-scripts]
+pdf-word-finder-gui = "pdf_word_finder.gui:main"
+
+[project.urls]
+Homepage = "https://github.com/nivaca/pdf-word-finder"
+Source = "https://codeberg.org/nivaca/pdf-word-finder"
+Changelog = "https://github.com/nivaca/pdf-word-finder/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = { attr = "pdf_word_finder.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

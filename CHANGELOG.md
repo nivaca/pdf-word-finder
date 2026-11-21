@@ -1,9 +1,45 @@
 # Changelog
 
 All notable changes to pdf-word-finder. The releases are on
-[GitHub](https://github.com/nivaca/pdf-word-finder/releases) (1.1, 1.4 and
-1.5 have release pages; 1.2 to 1.23 are only tags). The program and its
+[GitHub](https://github.com/nivaca/pdf-word-finder/releases) (1.1, 1.4, 1.5
+and 1.6 have release pages; 1.2 to 1.23 are only tags). The program and its
 README are in Spanish; an English README is in `README_en.md`.
+
+## 1.6 — 2026-11-21
+
+- **Python 3.14 or later is required**: in `pyproject.toml`, in the
+  READMEs, in the Windows launchers (an older Python counts as no Python,
+  and they offer to install a new one), and in the program itself, which
+  says so in one line instead of failing with a syntax error.
+- **The project is reorganized in directories.** The program is the
+  package `src/pdf_word_finder/`, split into modules: `extraction`,
+  `text`, `patterns`, `search`, `report`, `cli` and `gui`. A
+  `pyproject.toml` makes it installable (`pip install .`, `pipx install .`)
+  with two commands, `pdf-word-finder` and `pdf-word-finder-gui`. The
+  PyInstaller recipe and its two launchers are in `packaging/`,
+  `subir_version.py` is in `scripts/`, and the two `.bat` files are in
+  `windows/`.
+- The recipe `pdf_word_finder.spec` is now in the repository; before, the
+  `.gitignore` left it out.
+- The functions of the package raise exceptions (`PdfError`,
+  `PatternError`) instead of ending the program, and the command line and
+  the window share the search (`search()`), the report and the export to
+  TXT and CSV. The window no longer has its own copy of the search loop and
+  of the CSV export.
+- `scripts/construir.py` builds the executables and packs them, with the
+  license, the READMEs, the changelogs and `docs/`, in
+  `dist/pdf-word-finder-SYSTEM-VERSION.zip`.
+- Tests: 43, with pytest, in `tests/`. They make their own small PDFs.
+- The dependency is `pypdf[crypto]`, which also opens PDFs encrypted with
+  AES.
+- In the window, a context width that is not a number no longer stops the
+  search; it uses 60.
+- The README no longer describes the GitHub workflow, which was taken out
+  in 1.4; §11 explains how to build on each system and publish by hand.
+- Two description documents in `docs/`: `DESCRIPTION.md`, how the program
+  was made, and `DESCRIPCIÓN_es.md`, a description in Spanish.
+- The Linux package is built with Python 3.15. There is no Windows package
+  for this version.
 
 ## 1.5 — 2026-11-21
 

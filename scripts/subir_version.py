@@ -2,27 +2,26 @@
 """
 subir_version.py — cambia el número de versión del proyecto.
 
-    python subir_version.py 1.3        cambia la versión a 1.3
-    python subir_version.py --mostrar  dice cuál es la versión actual
-    python subir_version.py --revisar  comprueba que todo concuerde
+    python scripts/subir_version.py 1.6        cambia la versión a 1.6
+    python scripts/subir_version.py --mostrar  dice cuál es la versión actual
+    python scripts/subir_version.py --revisar  comprueba que todo concuerde
 
-El número vive en un solo sitio, `__version__` en pdf_word_finder.py, y de
-ahí lo toman la interfaz gráfica (que muestra `núcleo.__version__`) y la
-receta de PyInstaller (que lo lee del archivo al construir). Este programa
+El número vive en un solo sitio, `__version__` en
+src/pdf_word_finder/__init__.py, y de ahí lo toman el programa, la interfaz
+gráfica, pyproject.toml (como versión dinámica) y la receta de PyInstaller
+(que lo lee del archivo al construir). Este programa
 existe por los README (README.md y su traducción, README_en.md), que sí
 mencionan la cifra en varios lugares y no pueden deducirla de ninguna parte.
 
 © Nicolás Vaughan 2026. Licencia GNU GPL v3 o posterior.
 """
 
-from __future__ import annotations
-
 import re
 import sys
 from pathlib import Path
 
-RAÍZ = Path(__file__).parent.absolute()
-NÚCLEO = RAÍZ / "pdf_word_finder.py"
+RAÍZ = Path(__file__).resolve().parent.parent
+NÚCLEO = RAÍZ / "src" / "pdf_word_finder" / "__init__.py"
 LÉAMES = [RAÍZ / "README.md", RAÍZ / "README_en.md"]
 
 # Cada patrón lleva la versión en el grupo 1. Se anclan a su contexto en vez
@@ -108,7 +107,8 @@ def subir(nueva: str) -> None:
         print(f"{léame.name}: {total} menciones actualizadas")
 
     print(f"\n{anterior} → {nueva}")
-    print("\nLa interfaz gráfica y la receta de PyInstaller lo toman solas.")
+    print("\nEl programa, pyproject.toml y la receta de PyInstaller lo toman "
+          "solos.")
     print("Falta comprometer y etiquetar:")
     print(f'    git commit -am "Versión {nueva}"')
     print(f'    git tag -a {nueva} -m "Versión {nueva}"')

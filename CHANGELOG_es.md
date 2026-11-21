@@ -2,9 +2,46 @@
 
 Los cambios notables de pdf-word-finder. Las versiones publicadas están en
 [GitHub](https://github.com/nivaca/pdf-word-finder/releases) (la 1.1, la
-1.4 y la 1.5 tienen página de publicación; de la 1.2 a la 1.23 son solo etiquetas).
+1.4, la 1.5 y la 1.6 tienen página de publicación; de la 1.2 a la 1.23 son solo etiquetas).
 El programa y su README están en español; hay un README en inglés,
 `README_en.md`.
+
+## 1.6 — 2026-11-21
+
+- **Se requiere Python 3.14 o posterior**: en `pyproject.toml`, en los
+  README, en los lanzadores de Windows (un Python más viejo cuenta como si
+  no hubiera ninguno, y se ofrecen a instalar uno nuevo) y en el propio
+  programa, que lo dice en un renglón en vez de fallar con un error de
+  sintaxis.
+- **El proyecto se reorganiza en carpetas.** El programa es el paquete
+  `src/pdf_word_finder/`, dividido en módulos: `extraction`, `text`,
+  `patterns`, `search`, `report`, `cli` y `gui`. Un `pyproject.toml` lo
+  hace instalable (`pip install .`, `pipx install .`) con dos órdenes,
+  `pdf-word-finder` y `pdf-word-finder-gui`. La receta de PyInstaller y sus
+  dos lanzadores están en `packaging/`, `subir_version.py` en `scripts/`, y
+  los dos `.bat` en `windows/`.
+- La receta `pdf_word_finder.spec` está ahora en el repositorio; antes el
+  `.gitignore` la dejaba fuera.
+- Las funciones del paquete lanzan excepciones (`PdfError`,
+  `PatternError`) en vez de terminar el programa, y la línea de órdenes y la
+  ventana comparten la búsqueda (`search()`), el informe y la exportación a
+  TXT y CSV. La ventana ya no tiene su propia copia del bucle de búsqueda ni
+  de la exportación a CSV.
+- `scripts/construir.py` construye los ejecutables y los empaqueta, con la
+  licencia, los README, los registros de cambios y `docs/`, en
+  `dist/pdf-word-finder-SISTEMA-VERSIÓN.zip`.
+- Pruebas: 43, con pytest, en `tests/`. Generan sus propios PDF pequeños.
+- La dependencia es `pypdf[crypto]`, que abre también los PDF cifrados con
+  AES.
+- En la ventana, un ancho de contexto que no sea un número ya no detiene la
+  búsqueda: se usa 60.
+- El README ya no describe el flujo de trabajo de GitHub, que se quitó en
+  la 1.4; el §11 explica cómo construir en cada sistema y publicar a mano.
+- Dos documentos de descripción en `docs/`: `DESCRIPTION.md`, en inglés,
+  sobre cómo se hizo el programa, y `DESCRIPCIÓN_es.md`, una descripción en
+  español.
+- El paquete para Linux se construye con Python 3.15. Para esta versión no
+  hay paquete para Windows.
 
 ## 1.5 — 2026-11-21
 
