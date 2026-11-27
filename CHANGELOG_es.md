@@ -13,6 +13,9 @@ El programa y su README están en español; hay un README en inglés,
   (`build/release/pdf-word-finder-SISTEMA-VERSIÓN.zip`), y el trabajo
   intermedio de PyInstaller, en `build/pyinstaller/`. Los README (§11) y la
   receta lo dicen.
+- `scripts/test.py` corre las pruebas a la vez, cada archivo en un proceso
+  de pytest propio, tantos como procesadores (`-j N` lo cambia), y sale con
+  1 si alguna falla, con la salida de los archivos que fallaron.
 
 ## 1.6 — 2026-11-21
 

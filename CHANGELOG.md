@@ -11,6 +11,9 @@ README are in Spanish; an English README is in `README_en.md`.
   `dist/`: the program folder and the ZIP in `build/release/`
   (`build/release/pdf-word-finder-SYSTEM-VERSION.zip`), PyInstaller's work
   files in `build/pyinstaller/`. The READMEs (§11) and the recipe say so.
+- `scripts/test.py` runs the tests at once, each file in a pytest process
+  of its own, as many as there are processors (`-j N` changes it), and
+  exits with 1 if any fails, with the output of the files that failed.
 
 ## 1.6 — 2026-11-21
 

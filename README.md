@@ -136,7 +136,7 @@ src/pdf_word_finder/     el programa
     _argparse_es.py      los mensajes de argparse, en español
 tests/                   las pruebas (pytest)
 packaging/               la receta de PyInstaller y sus dos lanzadores
-scripts/                 construir.py y subir_version.py
+scripts/                 construir.py, subir_version.py y test.py
 windows/                 el lanzador y el acceso directo para Windows
 docs/                    el software libre usado y sus licencias
 pyproject.toml           los datos del paquete y sus dependencias
@@ -147,8 +147,13 @@ Las pruebas usan PDF pequeños que generan ellas mismas, con y sin árbol
 
 ```bash
 pip install -e ".[dev]"
-pytest
+python scripts/test.py
 ```
+
+`scripts/test.py` corre cada archivo de pruebas en un proceso propio, todos a
+la vez (tantos como procesadores; `-j N` lo cambia, `-v` muestra cada
+archivo al terminar), y sale con 1 si alguna falla, mostrando la salida de
+los archivos que fallaron. `pytest`, a secas, las corre una tras otra.
 
 ---
 

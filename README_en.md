@@ -148,7 +148,7 @@ src/pdf_word_finder/     the program
     _argparse_es.py      the messages of argparse, in Spanish
 tests/                   the tests (pytest)
 packaging/               the PyInstaller recipe and its two launchers
-scripts/                 construir.py and subir_version.py
+scripts/                 construir.py, subir_version.py and test.py
 windows/                 the launcher and the shortcut for Windows
 docs/                    the open-source software used, and its licenses
 pyproject.toml           the data of the package and its dependencies
@@ -159,8 +159,13 @@ The tests use small PDFs that they make themselves, with and without a
 
 ```bash
 pip install -e ".[dev]"
-pytest
+python scripts/test.py
 ```
+
+`scripts/test.py` runs each test file in a process of its own, all at once
+(as many as there are processors; `-j N` changes it, `-v` shows each file
+as it ends), and exits with 1 if any fails, showing the output of the files
+that failed. Plain `pytest` runs them one after the other.
 
 ---
 
