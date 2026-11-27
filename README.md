@@ -543,16 +543,18 @@ pip install pyinstaller "pypdf[crypto]"
 python scripts/construir.py
 ```
 
-El resultado es `dist/pdf-word-finder-SISTEMA-VERSIÓN.zip` (SISTEMA es
+El resultado es `build/release/pdf-word-finder-SISTEMA-VERSIÓN.zip` (SISTEMA es
 `linux`, `win` o `macos`), que lleva dentro la carpeta `pdf-word-finder/`
 con los ejecutables, la licencia, los README, los registros de cambios y
-`docs/`. La receta puede usarse también sola:
+`docs/`. Todo queda dentro de `build/` (el trabajo intermedio de
+PyInstaller, en `build/pyinstaller/`); `dist/` no se usa. La receta puede
+usarse también sola, con las mismas carpetas:
 
 ```bash
-pyinstaller --clean --noconfirm packaging/pdf_word_finder.spec
+pyinstaller --clean --noconfirm --distpath build/release --workpath build/pyinstaller packaging/pdf_word_finder.spec
 ```
 
-En `dist/pdf-word-finder/` quedan los dos programas —la interfaz gráfica y
+En `build/release/pdf-word-finder/` quedan los dos programas —la interfaz gráfica y
 el de consola— junto a la subcarpeta `_internal/` con el intérprete y las
 bibliotecas que ambos comparten. Nada de eso requiere Python en la máquina
 de destino. La carpeta entera pesa unos 50 MB y **se distribuye completa,
@@ -567,6 +569,10 @@ un ejecutable único por programa:
 PWF_ONEFILE=1 pyinstaller packaging/pdf_word_finder.spec          # macOS y Linux
 $env:PWF_ONEFILE=1; pyinstaller packaging/pdf_word_finder.spec    # Windows, PowerShell
 ```
+
+(Con las opciones `--distpath` y `--workpath` de arriba, los ejecutables
+quedan también en `build/release/`; sin ellas, PyInstaller los deja en
+`dist/`.)
 
 Un archivo suelto es más cómodo de mandar, pero paga dos precios. El
 primero es de velocidad: el ejecutable único se descomprime en una carpeta
@@ -657,15 +663,15 @@ Tres cosas que conviene tener presentes:
 Hay dos caminos.
 
 Por la web: pestaña «Releases» → «Draft a new release» → «Choose a tag»
-(puede crearla ahí mismo) → arrastrar los archivos de `dist/` a la zona de
+(puede crearla ahí mismo) → arrastrar los archivos de `build/release/` a la zona de
 adjuntos → «Publish release».
 
 Por consola, con la herramienta oficial `gh`:
 
 ```bash
 gh release create v1.6 \
-    dist/pdf-word-finder-linux-1.5.zip \
-    dist/pdf-word-finder-win-1.5.zip \
+    build/release/pdf-word-finder-linux-1.5.zip \
+    build/release/pdf-word-finder-win-1.5.zip \
     --title "pdf-word-finder 1.6" \
     --notes "Versión 1.6."
 ```

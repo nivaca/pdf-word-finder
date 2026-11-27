@@ -8,9 +8,13 @@ además empaqueta el resultado en un .zip con la licencia y la
 documentación. A mano, en la carpeta del proyecto:
 
     pip install pyinstaller "pypdf[crypto]"
-    pyinstaller --clean --noconfirm packaging/pdf_word_finder.spec
+    pyinstaller --clean --noconfirm --distpath build/release \
+        --workpath build/pyinstaller packaging/pdf_word_finder.spec
 
-Por omisión construye en MODO CARPETA: dist/pdf-word-finder/ contiene los dos
+(Sin --distpath ni --workpath, PyInstaller escribe en dist/ y build/; el
+proyecto deja todo en build/, y dist/ sin usar.)
+
+Por omisión construye en MODO CARPETA: pdf-word-finder/ contiene los dos
 ejecutables y, al lado, las bibliotecas que necesitan. Es lo recomendable.
 Arranca bastante más rápido, porque no tiene que descomprimirse en cada
 ejecución, y levanta muchas menos sospechas entre los antivirus, que
@@ -24,7 +28,8 @@ Para obtener en su lugar un ejecutable único por programa:
     set PWF_ONEFILE=1 && pyinstaller packaging/pdf_word_finder.spec   (Windows, cmd)
     $env:PWF_ONEFILE=1; pyinstaller packaging/pdf_word_finder.spec    (Windows, PowerShell)
 
-El resultado queda en dist/. PyInstaller NO compila para otros sistemas: hay
+(con las mismas opciones --distpath y --workpath). El resultado queda en
+build/release/. PyInstaller NO compila para otros sistemas: hay
 que ejecutarlo en Windows para obtener el .exe, en macOS para el .app y en
 Linux para el binario correspondiente. Véase el README, §11.
 

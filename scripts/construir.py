@@ -5,11 +5,13 @@ construir.py — construye los ejecutables y los empaqueta para distribuir.
     python scripts/construir.py
 
 Ejecuta PyInstaller con la receta packaging/pdf_word_finder.spec y comprime
-la carpeta resultante, junto con LICENSE, los README y docs/, en
+la carpeta resultante, build/release/pdf-word-finder/, junto con LICENSE, los
+README y docs/, en
 
-    dist/pdf-word-finder-SISTEMA-VERSIÓN.zip
+    build/release/pdf-word-finder-SISTEMA-VERSIÓN.zip
 
-donde SISTEMA es linux, win o macos. Usa el intérprete con que se lo llama,
+donde SISTEMA es linux, win o macos. Todo queda dentro de build/ (el trabajo
+intermedio de PyInstaller, en build/pyinstaller/); dist/ no se usa. Usa el intérprete con que se lo llama,
 que necesita PyInstaller y pypdf instalados:
 
     pip install pyinstaller "pypdf[crypto]"
@@ -30,8 +32,11 @@ from pathlib import Path
 
 RAÍZ = Path(__file__).resolve().parent.parent
 RECETA = RAÍZ / "packaging" / "pdf_word_finder.spec"
-DIST = RAÍZ / "dist"
 BUILD = RAÍZ / "build"
+# The program folder and the ZIP go here, not to dist/
+SALIDA = BUILD / "release"
+# PyInstaller's work files, apart from SALIDA so that they never mix
+TRABAJO = BUILD / "pyinstaller"
 ACOMPAÑANTES = ["LICENSE", "README.md", "README_en.md", "CHANGELOG.md",
                 "CHANGELOG_es.md", "docs"]
 
@@ -83,10 +88,10 @@ def main() -> None:
           f"{platform.python_version()}")
 
     subprocess.run([sys.executable, "-m", "PyInstaller", "--clean",
-                    "--noconfirm", "--distpath", str(DIST), "--workpath",
-                    str(BUILD), str(RECETA)], check=True, cwd=RAÍZ)
+                    "--noconfirm", "--distpath", str(SALIDA), "--workpath",
+                    str(TRABAJO), str(RECETA)], check=True, cwd=RAÍZ)
 
-    carpeta = DIST / "pdf-word-finder"
+    carpeta = SALIDA / "pdf-word-finder"
     for nombre in ACOMPAÑANTES:
         origen = RAÍZ / nombre
         if origen.is_dir():
@@ -94,7 +99,7 @@ def main() -> None:
         else:
             shutil.copy2(origen, carpeta / nombre)
 
-    destino = DIST / f"pdf-word-finder-{sistema()}-{v}.zip"
+    destino = SALIDA / f"pdf-word-finder-{sistema()}-{v}.zip"
     destino.unlink(missing_ok=True)
     comprimir(carpeta, destino)
     print(f"\n{destino.relative_to(RAÍZ)} "

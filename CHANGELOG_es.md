@@ -6,6 +6,14 @@ Los cambios notables de pdf-word-finder. Las versiones publicadas están en
 El programa y su README están en español; hay un README en inglés,
 `README_en.md`.
 
+## Sin publicar
+
+- `scripts/construir.py` deja todo en `build/`, y nada en `dist/`: la
+  carpeta del programa y el ZIP, en `build/release/`
+  (`build/release/pdf-word-finder-SISTEMA-VERSIÓN.zip`), y el trabajo
+  intermedio de PyInstaller, en `build/pyinstaller/`. Los README (§11) y la
+  receta lo dicen.
+
 ## 1.6 — 2026-11-21
 
 - **Se requiere Python 3.14 o posterior**: en `pyproject.toml`, en los

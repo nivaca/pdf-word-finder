@@ -5,6 +5,13 @@ All notable changes to pdf-word-finder. The releases are on
 and 1.6 have release pages; 1.2 to 1.23 are only tags). The program and its
 README are in Spanish; an English README is in `README_en.md`.
 
+## Unreleased
+
+- `scripts/construir.py` leaves everything in `build/`, and nothing in
+  `dist/`: the program folder and the ZIP in `build/release/`
+  (`build/release/pdf-word-finder-SYSTEM-VERSION.zip`), PyInstaller's work
+  files in `build/pyinstaller/`. The READMEs (§11) and the recipe say so.
+
 ## 1.6 — 2026-11-21
 
 - **Python 3.14 or later is required**: in `pyproject.toml`, in the
